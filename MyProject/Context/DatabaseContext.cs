@@ -22,5 +22,25 @@ namespace MyProject.Context
             var dbPath = Path.Join(path, "database.db");
             optionbuilder.UseSqlite($"Data Source={dbPath}");
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Chat>(chat =>
+            {
+                chat.HasOne(chat => chat.To)
+                    .WithMany(user => user.ReceivedChats)
+                    .HasForeignKey(chat => chat.ToUserId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                chat.HasOne(chat => chat.From)
+                    .WithMany(user => user.SentChats)
+                    .HasForeignKey(chat => chat.FromUserId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
     }
 }
