@@ -7,7 +7,7 @@ using MyProject.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -29,9 +29,14 @@ builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<DatabaseContext>()
     .AddSignInManager();
 
+builder.Services.AddScoped<DatabaseSeeder>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using var scope = app.Services.CreateScope();
+var seeder = scope.ServiceProvider.GetService<DatabaseSeeder>();
+await seeder!.Seed();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);

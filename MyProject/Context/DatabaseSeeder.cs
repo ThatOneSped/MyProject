@@ -23,8 +23,24 @@ namespace MyProject.Context
 
             if (!_context.Users.Any())
             {
-                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole("Seller"));
+                await _roleManager.CreateAsync(new IdentityRole("Buyer"));
             }
+
+            if (!_context.Items.Any())
+            {
+                var items = GetItems();
+                _context.Items.AddRange(items);
+                await _context!.SaveChangesAsync();
+            }
+        }
+
+        private List<Item> GetItems()
+        {
+            return
+            [
+
+            ];
         }
     }
 }
