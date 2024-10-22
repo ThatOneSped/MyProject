@@ -1,42 +1,223 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 
+<!-- Top Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-        <a class="navbar-brand" href="/">My Project</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">Home</NavLink>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
-                <AuthorizeView>
-                    <Authorized>
-                        <li class="navbar-text"> @context.User.Identity?.Name </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="/Account/Logout" Match="NavLinkMatch.All">Logout</NavLink>
-                        </li>
-                    </Authorized>
-                    <NotAuthorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="/Account/Login" Match="NavLinkMatch.Prefix">Login</NavLink>
-                        </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="/Account/Register" Match="NavLinkMatch.Prefix">Register</NavLink>
-                        </li>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </ul>
-        </div>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            My Project
+        </a>
+        <ul class="navbar-nav ml-auto d-flex align-items-center">
+            <AuthorizeView>
+                <Authorized>
+                    <li class="nav-item">
+                        <span class="navbar-text">@context.User.Identity?.Name</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Account/Logout">Logout</a>
+                    </li>
+                </Authorized>
+                <NotAuthorized>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Account/Login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Account/Register">Register</a>
+                    </li>
+                </NotAuthorized>
+            </AuthorizeView>
+        </ul>
     </div>
 </nav>
 
-<main class="container">
-    <div class="p-2 rounded">
-        @Body
+<!-- Sidebar and Main Content -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Fixed Sidebar -->
+        <div id="sidebar" class="sidebar bg-light">
+            <ul class="nav flex-column p-3">
+                <li class="nav-item">
+                    <a class="nav-link sidebar-link" href="#"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart"></i> Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link sidebar-link" href="#"><i class="fas fa-info-circle"></i> About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link sidebar-link" href="#"><i class="fas fa-phone"></i> Contact</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" class="col main-content p-3">
+            <h2>Featured Items</h2>
+            <div class="items-container position-relative">
+                <!-- Scroll Left Button -->
+                <button class="scroll-btn left" onclick="scrollItems(-1)">&#10094;</button>
+
+                <div class="items-display">
+                    <!-- Item Card 1 -->
+                    <div class="item-card">
+                        <img src="https://via.placeholder.com/150" alt="Item 1" class="item-image">
+                        <h5 class="item-title">Item 1</h5>
+                        <p class="item-description">Description for Item 1.</p>
+                    </div>
+                    <!-- Item Card 2 -->
+                    <div class="item-card">
+                        <img src="https://via.placeholder.com/150" alt="Item 2" class="item-image">
+                        <h5 class="item-title">Item 2</h5>
+                        <p class="item-description">Description for Item 2.</p>
+                    </div>
+                    <!-- Item Card 3 -->
+                    <div class="item-card">
+                        <img src="https://via.placeholder.com/150" alt="Item 3" class="item-image">
+                        <h5 class="item-title">Item 3</h5>
+                        <p class="item-description">Description for Item 3.</p>
+                    </div>
+                    <!-- Item Card 4 -->
+                    <div class="item-card">
+                        <img src="https://via.placeholder.com/150" alt="Item 4" class="item-image">
+                        <h5 class="item-title">Item 4</h5>
+                        <p class="item-description">Description for Item 4.</p>
+                    </div>
+                    <!-- Item Card 5 -->
+                    <div class="item-card">
+                        <img src="https://via.placeholder.com/150" alt="Item 5" class="item-image">
+                        <h5 class="item-title">Item 5</h5>
+                        <p class="item-description">Description for Item 5.</p>
+                    </div>
+                </div>
+
+                <!-- Scroll Right Button -->
+                <button class="scroll-btn right" onclick="scrollItems(1)">&#10095;</button>
+            </div>
+        </div>
     </div>
-</main>
+</div>
+
+<!-- CSS Styling for Sidebar, Navbar, and Items -->
+<style>
+    /* Navbar Styling */
+    .navbar {
+        z-index: 1050;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+        width: 200px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #f8f9fa;
+        border-right: 1px solid #e0e0e0;
+        z-index: 1000;
+    }
+
+    .sidebar-link {
+        color: #343a40;
+        padding: 15px 20px;
+        font-size: 16px;
+        display: block;
+        text-decoration: none;
+    }
+
+    .sidebar-link:hover {
+        background-color: #e9ecef;
+        color: #000;
+    }
+
+    .sidebar-link i {
+        margin-right: 10px;
+    }
+
+    /* Main Content */
+    .main-content {
+        margin-left: 220px; /* Offset by sidebar width */
+    }
+
+    /* Items Container */
+    .items-container {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .items-display {
+        display: flex;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        gap: 10px; /* Space between item cards */
+    }
+
+    .item-card {
+        flex: 0 0 auto; /* Prevent cards from shrinking */
+        width: 150px; /* Width of item cards */
+        background-color: #ffffff; /* Card background */
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .item-image {
+        width: 100%; /* Make image responsive */
+        height: auto; /* Maintain aspect ratio */
+        border-radius: 5px;
+    }
+
+    .item-title {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .item-description {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    /* Scroll Button Styling */
+    .scroll-btn {
+        background-color: transparent;
+        border: none;
+        font-size: 30px;
+        color: #007bff;
+        cursor: pointer;
+        z-index: 100; /* Position above other elements */
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 10px;
+    }
+
+    .scroll-btn.left {
+        left: 0;
+    }
+
+    .scroll-btn.right {
+        right: 0;
+    }
+
+
+</style>
+
+<!-- JavaScript for Horizontal Scrolling -->
+<script>
+    function scrollItems(direction) {
+        const container = document.querySelector('.items-display');
+        const scrollAmount = 150; // Adjust the scroll amount as needed
+
+        if (direction === 1) {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        } else {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+    }
+</script>
+
+<!-- Font Awesome for Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
