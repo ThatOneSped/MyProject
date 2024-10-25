@@ -1,67 +1,105 @@
 ﻿@page "/Account/Register"
 
 @using System.ComponentModel.DataAnnotations
-@using System.Text
-@using System.Text.Encodings.Web
 @using MyProject.Components.Account.Shared
 @using MyProject.Model
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.WebUtilities
 
 @inject UserManager<User> UserManager
-@inject IUserStore<User> UserStore
 @inject SignInManager<User> SignInManager
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
-@inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register</PageTitle>
+<PageTitle>Register - My Project</PageTitle>
 <StatusMessage Message="@statusMessage" IsError="@isError" />
 
-<div class="card">
-    <div class="card-body bg-light">
-        <h4 class="card-title">Register</h4>
+<!-- Centered Card -->
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="card" style="width: 30rem;">
+        <div class="card-body bg-light">
+            <h5 class="card-title text-center">Register</h5>
+            <EditForm OnValidSubmit="RegisterUser" Model="Model" FormName="registerForm">
+                <DataAnnotationsValidator />
 
-        <EditForm OnValidSubmit="RegisterUser" Model="Model" FormName="registerForm">
-            <div class="row g-3">
-                <div class="col-md-12">
-                    <label for="email" class="form-label">Email</label>
-                    <InputText class="form-control" placeholder="Email" @bind-Value="Model.Email" />
+                <div class="form-group mb-2">
+                    <label for="name">Name</label>
+                    <InputText id="name" class="form-control" placeholder="Your Name" @bind-Value="Model.Name" />
+                    <div class="small">
+                        <ValidationMessage For="@(() => Model!.Name)" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label for="password" class="form-label">Password</label>
-                    <InputText type="password" class="form-control" placeholder="Password" @bind-Value="Model.Password" />
+
+                <div class="form-group mb-2">
+                    <label for="username">Username</label>
+                    <InputText id="username" class="form-control" placeholder="Your Username" @bind-Value="Model.UserName" @onblur="CheckUsername" />
+                    <div class="small text-danger" style="display:@(usernameExists ? "block" : "none")">
+                        This username is already taken.
+                    </div>
+                    <div class="small">
+                        <ValidationMessage For="@(() => Model!.UserName)" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label for="name" class="form-label">Confirm Password</label>
-                    <InputText type="password" class="form-control" placeholder="Confirm Password" @bind-Value="Model.ConfirmPassword" />
+
+                <div class="form-group mb-2">
+                    <label for="password">Password</label>
+                    <InputText id="password" type="password" class="form-control" placeholder="Password" @bind-Value="Model.Password" />
+                    <div class="small">
+                        <ValidationMessage For="@(() => Model!.Password)" />
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
+
+                <div class="form-group mb-2">
+                    <label for="confirm">Confirm Password</label>
+                    <InputText id="confirm" type="password" class="form-control" placeholder="Confirm Password" @bind-Value="Model.ConfirmPassword" />
+                    <div class="small">
+                        <ValidationMessage For="@(() => Model!.ConfirmPassword)" />
+                    </div>
                 </div>
-            </div>
-        </EditForm>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-outline-primary w-100" disabled="@usernameExists">Register</button>
+                </div>
+            </EditForm>
+        </div>
     </div>
 </div>
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
+    private bool usernameExists = false; // Track if username is taken
 
     [SupplyParameterFromForm]
     private RegisterModel Model { get; set; } = new();
 
-    [SupplyParameterFromQuery]
-    private string? ReturnUrl { get; set; }
-
     private string? statusMessage => identityErrors is null ? null : string.Join(" ", identityErrors.Select(error => error.Description));
     private bool isError;
 
-    public async Task RegisterUser(EditContext editContext)
+    // Method to check username existence
+    private async Task CheckUsername()
     {
-        var user = Activator.CreateInstance<User>(); ;
-        await UserStore.SetUserNameAsync(user, Model.Email, CancellationToken.None);
-        var emailStore = (IUserEmailStore<User>)UserStore;
-        await emailStore.SetEmailAsync(user, Model.Email, CancellationToken.None);
+        var existingUser = await UserManager.FindByNameAsync(Model.UserName);
+        usernameExists = existingUser != null; // Set flag if username exists
+    }
+
+    public async Task RegisterUser()
+    {
+        if (usernameExists)
+        {
+            // Prevent registration if username already exists
+            identityErrors = new List<IdentityError>
+            {
+                new IdentityError { Description = "This username is already taken." }
+            };
+            isError = true;
+            return;
+        }
+
+        var user = new User
+            {
+                UserName = Model.UserName,
+                Name = Model.Name
+            };
+
         var result = await UserManager.CreateAsync(user, Model.Password);
 
         if (!result.Succeeded)
@@ -71,20 +109,26 @@
             return;
         }
 
-        Logger.LogInformation("User created a new account with password.");
-
-        var userId = await UserManager.GetUserIdAsync(user);
-
+        // Log the user in after registration
         await SignInManager.SignInAsync(user, isPersistent: false);
-        RedirectManager.RedirectTo(ReturnUrl);
+        NavigationManager.NavigateTo("/Account/Login");
     }
 
     private sealed class RegisterModel
     {
-        public string Email { get; set; } = "";
+        [Required(ErrorMessage = "Please enter your name.")]
+        public string Name { get; set; } = "";
 
+        [Required(ErrorMessage = "Please enter a username.")]
+        public string UserName { get; set; } = "";
+
+        [Required(ErrorMessage = "Please enter a password.")]
+        [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 
+        [Required(ErrorMessage = "Please confirm your password.")]
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
     }
 }
