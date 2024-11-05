@@ -22,14 +22,6 @@ namespace MyProject.Context
         {
             await _context.Database.MigrateAsync();
 
-            if (!_context.Items.Any())
-            {
-                var items = GetItems();
-                _context.Items.AddRange(items);
-                await _context!.SaveChangesAsync();
-            }
-
-
             if (!_context.Users.Any())
             {
                 await _roleManager.CreateAsync(new IdentityRole("Admin"));
@@ -50,6 +42,13 @@ namespace MyProject.Context
 
                 await _userManager.CreateAsync(admin, adminPassword);
                 await _userManager.AddToRoleAsync(admin, "Admin");
+            }
+
+            if (!_context.Items.Any())
+            {
+                var items = GetItems();
+                _context.Items.AddRange(items);
+                await _context!.SaveChangesAsync();
             }
         }
 
