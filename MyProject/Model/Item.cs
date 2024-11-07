@@ -11,6 +11,7 @@ namespace MyProject.Model
         public decimal ItemPrice { get; set; }
         public string ItemSize { get; set; }
         public string Description { get; set; }
+        public string ImageUrl { get; set; }
 
         public Category Category { get; set; }
         public User User { get; set; }

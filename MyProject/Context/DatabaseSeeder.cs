@@ -59,7 +59,5 @@ namespace MyProject.Context
                 new Item { ItemName = "Placeholder", ItemPrice = 999.99M, ItemSize = "L", Description = "Placeholder", Category = new Category { CategoryName = "Placeholder" } }
             ];
         }
-
-
     }
 }

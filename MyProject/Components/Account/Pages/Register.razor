@@ -13,60 +13,48 @@
 <PageTitle>Register - My Project</PageTitle>
 <StatusMessage Message="@statusMessage" IsError="@isError" />
 
-<!-- Centered Card -->
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-    <div class="card" style="width: 30rem;">
-        <div class="card-body bg-light">
-            <h5 class="card-title text-center">Register</h5>
-            <EditForm OnValidSubmit="RegisterUser" Model="Model" FormName="registerForm">
-                <DataAnnotationsValidator />
+<!-- Centered Card for Register Form -->
+<div class="d-flex justify-content-center align-items-center" style="height: 70vh;">
+    <div class="card shadow-lg p-4" style="max-width: 400px; border: 1px solid #ccc;">
+        <h5 class="card-title text-center mb-4">Register</h5>
+        <EditForm OnValidSubmit="RegisterUser" Model="Model">
+            <DataAnnotationsValidator />
 
-                <div class="form-group mb-2">
-                    <label for="name">Name</label>
-                    <InputText id="name" class="form-control" placeholder="Your Name" @bind-Value="Model.Name" />
-                    <div class="small">
-                        <ValidationMessage For="@(() => Model!.Name)" />
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <InputText id="name" class="form-control" placeholder="Your Name" @bind-Value="Model.Name" />
+                <ValidationMessage For="@(() => Model!.Name)" class="text-danger small" />
+            </div>
 
-                <div class="form-group mb-2">
-                    <label for="username">Username</label>
-                    <InputText id="username" class="form-control" placeholder="Your Username" @bind-Value="Model.UserName" @onblur="CheckUsername" />
-                    <div class="small text-danger" style="display:@(usernameExists ? "block" : "none")">
-                        This username is already taken.
-                    </div>
-                    <div class="small">
-                        <ValidationMessage For="@(() => Model!.UserName)" />
-                    </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <InputText id="username" class="form-control" placeholder="Choose a Username" @bind-Value="Model.UserName" @onblur="CheckUsername" />
+                <div class="text-danger small" style="display:@(usernameExists ? "block" : "none")"
+                    This username is already taken.
                 </div>
+                <ValidationMessage For="@(() => Model!.UserName)" class="text-danger small" />
+            </div>
 
-                <div class="form-group mb-2">
-                    <label for="password">Password</label>
-                    <InputText id="password" type="password" class="form-control" placeholder="Password" @bind-Value="Model.Password" />
-                    <div class="small">
-                        <ValidationMessage For="@(() => Model!.Password)" />
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <InputText id="password" type="password" class="form-control" placeholder="Password" @bind-Value="Model.Password" />
+                <ValidationMessage For="@(() => Model!.Password)" class="text-danger small" />
+            </div>
 
-                <div class="form-group mb-2">
-                    <label for="confirm">Confirm Password</label>
-                    <InputText id="confirm" type="password" class="form-control" placeholder="Confirm Password" @bind-Value="Model.ConfirmPassword" />
-                    <div class="small">
-                        <ValidationMessage For="@(() => Model!.ConfirmPassword)" />
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label for="confirm" class="form-label">Confirm Password</label>
+                <InputText id="confirm" type="password" class="form-control" placeholder="Confirm Password" @bind-Value="Model.ConfirmPassword" />
+                <ValidationMessage For="@(() => Model!.ConfirmPassword)" class="text-danger small" />
+            </div>
 
-                <div class="mt-3">
-                    <button type="submit" class="btn btn-outline-primary w-100" disabled="@usernameExists">Register</button>
-                </div>
-            </EditForm>
-        </div>
+            <button type="submit" class="btn btn-primary w-100" disabled="@usernameExists">Register</button>
+        </EditForm>
     </div>
 </div>
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
-    private bool usernameExists = false; // Track if username is taken
+    private bool usernameExists = false;
 
     [SupplyParameterFromForm]
     private RegisterModel Model { get; set; } = new();
@@ -74,18 +62,16 @@
     private string? statusMessage => identityErrors is null ? null : string.Join(" ", identityErrors.Select(error => error.Description));
     private bool isError;
 
-    // Method to check username existence
     private async Task CheckUsername()
     {
         var existingUser = await UserManager.FindByNameAsync(Model.UserName);
-        usernameExists = existingUser != null; // Set flag if username exists
+        usernameExists = existingUser != null;
     }
 
     public async Task RegisterUser()
     {
         if (usernameExists)
         {
-            // Prevent registration if username already exists
             identityErrors = new List<IdentityError>
             {
                 new IdentityError { Description = "This username is already taken." }
@@ -109,7 +95,6 @@
             return;
         }
 
-        // Log the user in after registration
         await SignInManager.SignInAsync(user, isPersistent: false);
         NavigationManager.NavigateTo("/Account/Login");
     }
