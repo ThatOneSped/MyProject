@@ -1,7 +1,124 @@
 ﻿@page "/list-an-item"
+@using MyProject.Context
 @using MyProject.Model
-
 @inject NavigationManager NavigationManager
-@code {
+@inject ItemProvider ItemProvider
 
+
+<!-- area for sidebar -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 bg-dark text-white sidebar">
+            <nav class="nav flex-column">
+                <a class="nav-link text-white" href="/">Home</a>
+                <a class="nav-link text-white" href="/listings">View Listings</a>
+                <a class="nav-link text-white" href="/add-item">Add Item</a>
+                <a class="nav-link text-white" href="/favorites">Favorites</a>
+            </nav>
+        </div>
+
+        <!-- area for form -->
+        <div class="col-md-10">
+            <div class="p-4">
+                <h2 class="mb-4">Add New Item</h2>
+
+                <!-- Form for adding new items -->
+                <EditForm Model="newItem" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator /> 
+
+                    <div class="form-group mb-3">
+                        <label for="itemName">Item Name</label>
+                        <InputText id="itemName" class="form-control" @bind-Value="newItem.ItemName" required />
+                        <ValidationMessage For="@(() => newItem.ItemName)" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="itemPrice">Item Price</label>
+                        <InputNumber id="itemPrice" class="form-control" @bind-Value="newItem.ItemPrice" required />
+                        <ValidationMessage For="@(() => newItem.ItemPrice)" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="itemSize">Item Size</label>
+                        <InputText id="itemSize" class="form-control" @bind-Value="newItem.ItemSize" required />
+                        <ValidationMessage For="@(() => newItem.ItemSize)" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="description">Description</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="imageUrl">Image URL</label>
+                        <InputText id="imageUrl" class="form-control" @bind-Value="newItem.ImageUrl" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="category">Category</label>
+                        <InputText id="category" class="form-control" @bind-Value="newItem.Category.CategoryName" />
+                    </div>
+
+                    <!-- warning message about incomplete form reducing sales volume -->
+                    @if (string.IsNullOrWhiteSpace(newItem.Description) || string.IsNullOrWhiteSpace(newItem.ImageUrl) || string.IsNullOrWhiteSpace(newItem.Category?.CategoryName))
+                    {
+                        <div class="alert alert-warning mt-2">
+                            Some fields are empty: Description, Image, or Category. Items with these details are more likely to sell.
+                            <button type="button" class="btn btn-outline-secondary mt-2" @onclick="ConfirmContinue">Yes, I'm sure</button>
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-primary w-100" disabled="@(!confirmationGiven)">Add Item</button>
+                </EditForm>
+
+                @if (isSuccess)
+                {
+                    <div class="alert alert-success mt-3">Item added successfully!</div>
+                }
+                else if (isError)
+                {
+                    <div class="alert alert-danger mt-3">Failed to add item. Please try again.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Item newItem = new Item(); // clear room for new item
+    private bool isSuccess = false; // see if item was successfully listed
+    private bool isError = false; // see if there was an error when listing an item
+    private bool confirmationGiven = false; // see if the user has submitted an item without optional fields
+
+    private async Task HandleValidSubmit()
+    {
+        if (!confirmationGiven &&
+            (string.IsNullOrWhiteSpace(newItem.Description) ||
+             string.IsNullOrWhiteSpace(newItem.ImageUrl) ||
+             string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
+        {
+            // make user confirm before listing the item
+            return;
+        }
+
+        try
+        {
+            await ItemProvider.AddItemAsync(newItem); // add item to db
+            isSuccess = true; // item sucessfully listed
+            isError = false; // clear errors previously made
+            newItem = new Item(); // clear form for new item
+            confirmationGiven = false; // resets confirmation ready for then ext item
+        }
+        catch (Exception)
+        {
+            isSuccess = false; // displays error 
+            isError = true;
+        }
+    }
+
+    private void ConfirmContinue()
+    {
+        confirmationGiven = true; // this means htat the user has submitted the item without optional data
+    }
 }

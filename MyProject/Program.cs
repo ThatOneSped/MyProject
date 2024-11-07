@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using MyProject.Components.Account;
 using MyProject.Context;
 using MyProject.Model;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,9 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlite("Data Source=database.db"));
+builder.Services.AddScoped<ItemProvider>();  // registers ItemProvider 
 
 builder.Services.AddAuthentication(options =>
 {
