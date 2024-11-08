@@ -367,10 +367,6 @@ namespace MyProject.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("PasswordHash")
                         .HasColumnType("TEXT");
 
@@ -387,7 +383,6 @@ namespace MyProject.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 

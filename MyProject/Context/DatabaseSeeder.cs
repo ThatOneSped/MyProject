@@ -32,7 +32,7 @@ namespace MyProject.Context
             if (!_context.Users.Any())
             {
                 var adminEmail = "admin@clothing.com";
-                var adminPassword = "Clothes123";
+                var adminPassword = "Clothes123!";
 
                 var admin = new User
                 {
@@ -42,8 +42,8 @@ namespace MyProject.Context
                     Address = "London SW1A 1AA",
                 };
 
-                await _userManager.CreateAsync(admin, adminPassword);
-                await _userManager.AddToRoleAsync(admin, "Admin");
+               var result =  await _userManager.CreateAsync(admin, adminPassword);
+                var roleresult = await _userManager.AddToRoleAsync(admin, "Admin");
             }
 
             if (!_context.Categories.Any())
@@ -52,7 +52,10 @@ namespace MyProject.Context
                 {
                     new Category { CategoryName = "Jeans" },
                     new Category { CategoryName = "T-Shirts" },
-                    new Category { CategoryName = "Jackets" }
+                    new Category { CategoryName = "Jackets" },
+                    new Category { CategoryName = "Shoes" },
+                    new Category { CategoryName = "Accessories" },
+                    new Category { CategoryName = "Trousers" }
                 };
 
                 _context.Categories.AddRange(categories);

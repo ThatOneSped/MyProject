@@ -11,8 +11,8 @@ using MyProject.Context;
 namespace MyProject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241108123609_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241108141025_initialcreate")]
+    partial class initialcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -370,10 +370,6 @@ namespace MyProject.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("PasswordHash")
                         .HasColumnType("TEXT");
 
@@ -390,7 +386,6 @@ namespace MyProject.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
