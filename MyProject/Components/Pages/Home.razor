@@ -4,6 +4,7 @@
 @inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
@@ -19,6 +20,10 @@
         </li>
         <li class="nav-item">
             <a class="nav-link sidebar-link" href="#"><i class="fas fa-phone"></i> Contact</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link sidebar-link" @onclick="OnListItemClick">
+                <i class="fas fa-plus"></i> List an Item </a>
         </li>
     </ul>
 </div>
@@ -111,7 +116,7 @@
     .background-dimmer {
         display: none;
         position: fixed;
-        top: 56px; /* starts below navbar */ 
+        top: 56px; /* starts below navbar */
         left: 0;
         width: 100%;
         height: calc(100% - 56px); /* excludes navbar */
@@ -160,3 +165,29 @@
 
 <!-- Font Awesome for Icons -->
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+@code {
+    private bool IsUserLoggedIn { get; set; }
+
+    // This will check if the user is logged in
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        IsUserLoggedIn = authenticationState.User.Identity.IsAuthenticated;
+    }
+
+    // This function will handle click on "List an Item" button
+    private void OnListItemClick()
+    {
+        if (IsUserLoggedIn)
+        {
+            // redirect to the List an Item page if the user is logged in
+            NavigationManager.NavigateTo("/list-an-item");
+        }
+        else
+        {
+            // redirect to register page if the user is not logged in
+            NavigationManager.NavigateTo("/Account/Register");
+        }
+    }
+}

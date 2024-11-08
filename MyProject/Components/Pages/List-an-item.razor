@@ -1,9 +1,10 @@
 ﻿@page "/list-an-item"
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyProject.Context
 @using MyProject.Model
 @inject NavigationManager NavigationManager
 @inject ItemProvider ItemProvider
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <!-- area for sidebar -->
 <div class="container-fluid">
@@ -13,7 +14,14 @@
             <nav class="nav flex-column">
                 <a class="nav-link text-white" href="/">Home</a>
                 <a class="nav-link text-white" href="/listings">View Listings</a>
-                <a class="nav-link text-white" href="/add-item">Add Item</a>
+                @if (isLoggedIn)
+                {
+                    <a class="nav-link text-white" href="/list-an-item">List an Item</a>
+                }
+                else
+                {
+                    <a class="nav-link text-white" href="/register">Register</a>
+                }
                 <a class="nav-link text-white" href="/favorites">Favorites</a>
             </nav>
         </div>
@@ -25,7 +33,7 @@
 
                 <!-- Form for adding new items -->
                 <EditForm Model="newItem" OnValidSubmit="HandleValidSubmit">
-                    <DataAnnotationsValidator /> 
+                    <DataAnnotationsValidator />
 
                     <div class="form-group mb-3">
                         <label for="itemName">Item Name</label>
@@ -61,7 +69,7 @@
                     </div>
 
                     <!-- warning message about incomplete form reducing sales volume -->
-                    @if (string.IsNullOrWhiteSpace(newItem.Description) || string.IsNullOrWhiteSpace(newItem.ImageUrl) || string.IsNullOrWhiteSpace(newItem.Category?.CategoryName))
+                    @if (formSubmitted && (string.IsNullOrWhiteSpace(newItem.Description) || string.IsNullOrWhiteSpace(newItem.ImageUrl) || newItem.Category == null || string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
                     {
                         <div class="alert alert-warning mt-2">
                             Some fields are empty: Description, Image, or Category. Items with these details are more likely to sell.
@@ -90,9 +98,28 @@
     private bool isSuccess = false; // see if item was successfully listed
     private bool isError = false; // see if there was an error when listing an item
     private bool confirmationGiven = false; // see if the user has submitted an item without optional fields
+    private bool formSubmitted = false; // track if the user has attempted to submit the form
+    private bool isLoggedIn = false; // track if the user is logged in
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Ensure Category is initialized
+        if (newItem.Category == null)
+        {
+            newItem.Category = new Category(); // Initialize the Category object to prevent NullReferenceException
+        }
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Check if the user is logged in (check if the user is authenticated)
+        isLoggedIn = user.Identity.IsAuthenticated;
+    }
 
     private async Task HandleValidSubmit()
     {
+        formSubmitted = true; // Track that the form was submitted
+
         if (!confirmationGiven &&
             (string.IsNullOrWhiteSpace(newItem.Description) ||
              string.IsNullOrWhiteSpace(newItem.ImageUrl) ||
@@ -105,20 +132,21 @@
         try
         {
             await ItemProvider.AddItemAsync(newItem); // add item to db
-            isSuccess = true; // item sucessfully listed
+            isSuccess = true; // item successfully listed
             isError = false; // clear errors previously made
             newItem = new Item(); // clear form for new item
-            confirmationGiven = false; // resets confirmation ready for then ext item
+            confirmationGiven = false; // resets confirmation ready for the next item
+            formSubmitted = false; // reset the form submission tracker
         }
         catch (Exception)
         {
-            isSuccess = false; // displays error 
+            isSuccess = false; // displays error
             isError = true;
         }
     }
 
     private void ConfirmContinue()
     {
-        confirmationGiven = true; // this means htat the user has submitted the item without optional data
+        confirmationGiven = true; // this means that the user has submitted the item without optional data
     }
 }
