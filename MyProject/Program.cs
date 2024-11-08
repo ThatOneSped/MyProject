@@ -17,7 +17,8 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlite("Data Source=database.db"));
+builder.Services.AddDbContext<DatabaseContext>(options =>
+    options.UseSqlite("Data Source=database.db"));
 builder.Services.AddScoped<ItemProvider>();  // registers ItemProvider 
 
 builder.Services.AddAuthentication(options =>

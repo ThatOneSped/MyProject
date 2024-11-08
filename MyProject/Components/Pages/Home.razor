@@ -80,8 +80,8 @@
         width: 200px;
         height: 100vh;
         position: fixed;
-        top: 56px; /* Adjust to navbar height */
-        left: -200px; /* Initially hidden offscreen */
+        top: 56px; /* adjust to navbar height */
+        left: -200px; /* starts off hidden  */
         background-color: var(--primary-color);
         border-right: 1px solid #e0e0e0;
         transition: left 0.3s ease;
@@ -103,7 +103,7 @@
     }
 
         .sidebar-link:hover {
-            background-color: rgba(255, 255, 255, 0.2); /* Slight hover effect */
+            background-color: rgba(255, 255, 255, 0.2); /* hover effect */
             color: var(--text-light);
         }
 
@@ -111,10 +111,10 @@
     .background-dimmer {
         display: none;
         position: fixed;
-        top: 56px; /* Starts below navbar */
+        top: 56px; /* starts below navbar */ 
         left: 0;
         width: 100%;
-        height: calc(100% - 56px); /* Excludes navbar */
+        height: calc(100% - 56px); /* excludes navbar */
         background: rgba(0, 0, 0, 0.5);
         z-index: 1049;
         opacity: 0;

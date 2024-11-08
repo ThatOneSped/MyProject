@@ -22,12 +22,15 @@ namespace MyProject.Context
         {
             await _context.Database.MigrateAsync();
 
-            if (!_context.Users.Any())
+            if (!_context.Roles.Any())
             {
                 await _roleManager.CreateAsync(new IdentityRole("Admin"));
                 await _roleManager.CreateAsync(new IdentityRole("Seller"));
                 await _roleManager.CreateAsync(new IdentityRole("Buyer"));
+            }
 
+            if (!_context.Users.Any())
+            {
                 var adminEmail = "admin@clothing.com";
                 var adminPassword = "Clothes123";
 
@@ -37,27 +40,52 @@ namespace MyProject.Context
                     Email = adminEmail,
                     Name = "AdminUser",
                     Address = "London SW1A 1AA",
-
                 };
 
                 await _userManager.CreateAsync(admin, adminPassword);
                 await _userManager.AddToRoleAsync(admin, "Admin");
             }
 
+            if (!_context.Categories.Any())
+            {
+                var categories = new List<Category>
+                {
+                    new Category { CategoryName = "Jeans" },
+                    new Category { CategoryName = "T-Shirts" },
+                    new Category { CategoryName = "Jackets" }
+                };
+
+                _context.Categories.AddRange(categories);
+                await _context.SaveChangesAsync();
+            }
+
             if (!_context.Items.Any())
             {
-                var items = GetItems();
-                _context.Items.AddRange(items);
-                await _context!.SaveChangesAsync();
-            }
-        }
+                // retrieve existing category and user for item seeding
+                var jeansCategory = _context.Categories.FirstOrDefault(c => c.CategoryName == "Jeans");
+                var adminUser = _context.Users.FirstOrDefault(u => u.Email == "admin@clothing.com");
 
-        private List<Item> GetItems()
-        {
-            return
-            [
-                new Item { ItemName = "Placeholder", ItemPrice = 999.99M, ItemSize = "L", Description = "Placeholder", Category = new Category { CategoryName = "Placeholder" } }
-            ];
+                if (jeansCategory != null && adminUser != null)
+                {
+                    var items = new List<Item>
+                    {
+                        new Item
+                        {
+                            ItemName = "Blue Denim Jeans",
+                            ItemPrice = 59.99M,
+                            ItemSize = "M",
+                            Description = "Classic blue denim jeans.",
+                            Category = jeansCategory, // Referencing existing category
+                            User = adminUser, // Referencing existing user
+                            ImageUrl = "https://example.com/blue-jeans.jpg"
+                        },
+
+                    };
+
+                    _context.Items.AddRange(items);
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
     }
 }
