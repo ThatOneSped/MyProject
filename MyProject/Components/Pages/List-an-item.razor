@@ -22,16 +22,16 @@
                 {
                     <a class="nav-link text-white" href="/register">Register</a>
                 }
-                <a class="nav-link text-white" href="/favorites">Favorites</a>
+                <a class="nav-link text-white" href="/favourites">Favourites</a>
             </nav>
         </div>
 
         <!-- area for form -->
         <div class="col-md-10">
             <div class="p-4">
-                <h2 class="mb-4">Add New Item</h2>
+                <h2 class="mb-4">List New Item</h2>
 
-                <!-- Form for adding new items -->
+                <!-- form for listing items -->
                 <EditForm Model="newItem" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator />
 
@@ -77,16 +77,16 @@
                         </div>
                     }
 
-                    <button type="submit" class="btn btn-primary w-100" disabled="@(!confirmationGiven)">Add Item</button>
+                    <button type="submit" class="btn btn-primary w-100" disabled="@(!confirmationGiven)">List Item</button>
                 </EditForm>
 
                 @if (isSuccess)
                 {
-                    <div class="alert alert-success mt-3">Item added successfully!</div>
+                    <div class="alert alert-success mt-3">Item listed!</div>
                 }
                 else if (isError)
                 {
-                    <div class="alert alert-danger mt-3">Failed to add item. Please try again.</div>
+                    <div class="alert alert-danger mt-3">Failed to list item. Please try again.</div>
                 }
             </div>
         </div>
@@ -103,22 +103,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Ensure Category is initialized
         if (newItem.Category == null)
         {
-            newItem.Category = new Category(); // Initialize the Category object to prevent NullReferenceException
+            newItem.Category = new Category(); 
         }
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        // Check if the user is logged in (check if the user is authenticated)
+        // checks if the user is logged in 
         isLoggedIn = user.Identity.IsAuthenticated;
     }
 
     private async Task HandleValidSubmit()
     {
-        formSubmitted = true; // Track that the form was submitted
+        formSubmitted = true; // tracks if the form was submitted
 
         if (!confirmationGiven &&
             (string.IsNullOrWhiteSpace(newItem.Description) ||
