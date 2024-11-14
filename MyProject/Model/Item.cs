@@ -9,11 +9,11 @@ namespace MyProject.Model
 
         public string ItemName { get; set; }
         public decimal ItemPrice { get; set; }
-        public string ItemSize { get; set; }
-        public string Description { get; set; }
-        public string ImageUrl { get; set; }
+        public string? ItemSize { get; set; }
+        public string? Description { get; set; }
+        public string? ImageUrl { get; set; }
 
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
         public User User { get; set; }
 
         public ICollection<OrderItem> OrderItems { get; set; }

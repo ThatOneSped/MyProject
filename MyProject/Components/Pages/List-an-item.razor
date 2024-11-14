@@ -65,7 +65,13 @@
 
                     <div class="form-group mb-3">
                         <label for="category">Category</label>
-                        <InputText id="category" class="form-control" @bind-Value="newItem.Category.CategoryName" />
+                        <InputSelect id="category" class="form-control" @bind-Value="newItem.Category.CategoryName">
+                            @foreach (var category in categories)
+                            {
+                                <option value="@category.CategoryName">@category.CategoryName</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => newItem.Category.CategoryName)" />
                     </div>
 
                     <!-- warning message about incomplete form reducing sales volume -->
@@ -100,19 +106,23 @@
     private bool confirmationGiven = false; // see if the user has submitted an item without optional fields
     private bool formSubmitted = false; // track if the user has attempted to submit the form
     private bool isLoggedIn = false; // track if the user is logged in
+    private List<Category> categories = new(); // list of categories for dropdown
 
     protected override async Task OnInitializedAsync()
     {
         if (newItem.Category == null)
         {
-            newItem.Category = new Category(); 
+            newItem.Category = new Category();
         }
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        // checks if the user is logged in 
+        // checks if the user is logged in
         isLoggedIn = user.Identity.IsAuthenticated;
+
+        // grab the caterogries
+        categories = await ItemProvider.GetCategoriesAsync();
     }
 
     private async Task HandleValidSubmit()

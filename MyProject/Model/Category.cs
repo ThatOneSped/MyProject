@@ -7,7 +7,7 @@ namespace MyProject.Model
         [Key]
         public int ID { get; set; }  // Primary Key
 
-        public string CategoryName { get; set; }
+        public string? CategoryName { get; set; }
 
         public ICollection<Item> Items { get; set; }
     }
