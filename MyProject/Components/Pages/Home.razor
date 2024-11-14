@@ -10,20 +10,19 @@
 <div id="sidebar" class="sidebar">
     <ul class="nav flex-column p-3">
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-home"></i> Home</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-home">🏠</i> Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart"></i> Shop</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart">🛒</i> Shopping Cart </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-info-circle"></i> About</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-info">ℹ️</i> About</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-phone"></i> Contact</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-phone">📞</i> Contact</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" @onclick="OnListItemClick">
-                <i class="fas fa-plus"></i> List an Item </a>
+            <a class="nav-link sidebar-link" @onclick="OnListItemClick"><i class="fas fa-plus">➕</i> List an Item </a>
         </li>
     </ul>
 </div>
@@ -163,8 +162,6 @@
     document.getElementById('toggle-sidebar').classList.add('closed');
 </script>
 
-<!-- Font Awesome for Icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js"></script>
 
 @code {
     private bool IsUserLoggedIn { get; set; }
