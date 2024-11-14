@@ -45,50 +45,50 @@ namespace MyProject.Context
                var result =  await _userManager.CreateAsync(admin, adminPassword);
                 var roleresult = await _userManager.AddToRoleAsync(admin, "Admin");
             }
-            
-            //if (!_context.Categories.Any())
-            //{
-            //    var categories = new List<Category>
-            //    {
-            //        new Category { CategoryName = "Jeans" },
-            //        new Category { CategoryName = "T-Shirts" },
-            //        new Category { CategoryName = "Jackets" },
-            //        new Category { CategoryName = "Shoes" },
-            //        new Category { CategoryName = "Accessories" },
-            //        new Category { CategoryName = "Trousers" }
-            //    };
 
-            //    _context.Categories.AddRange(categories);
-            //    await _context.SaveChangesAsync();
-            //}
+            if (!_context.Categories.Any())
+            {
+                var categories = new List<Category>
+                {
+                    new Category { CategoryName = "Jeans" },
+                    new Category { CategoryName = "T-Shirts" },
+                    new Category { CategoryName = "Jackets" },
+                    new Category { CategoryName = "Shoes" },
+                    new Category { CategoryName = "Accessories" },
+                    new Category { CategoryName = "Trousers" }
+                };
 
-            //if (!_context.Items.Any())
-            //{
-            //    // retrieve existing category and user for item seeding
-            //    var jeansCategory = _context.Categories.FirstOrDefault(c => c.CategoryName == "Jeans");
-            //    var adminUser = _context.Users.FirstOrDefault(u => u.Email == "admin@clothing.com");
+                _context.Categories.AddRange(categories);
+                await _context.SaveChangesAsync();
+            }
 
-            //    if (jeansCategory != null && adminUser != null)
-            //    {
-            //        var items = new List<Item>
-            //        {
-            //            new Item
-            //            {
-            //                ItemName = "Blue Denim Jeans",
-            //                ItemPrice = 59.99M,
-            //                ItemSize = "M",
-            //                Description = "Classic blue denim jeans.",
-            //                Category = jeansCategory, // Referencing existing category
-            //                User = adminUser, // Referencing existing user
-            //                ImageUrl = "https://example.com/blue-jeans.jpg"
-            //            },
+            if (!_context.Items.Any())
+            {
+                // retrieve existing category and user for item seeding
+                var jeansCategory = _context.Categories.FirstOrDefault(c => c.CategoryName == "Jeans");
+                var adminUser = _context.Users.FirstOrDefault(u => u.Email == "admin@clothing.com");
 
-            //        };
+                if (jeansCategory != null && adminUser != null)
+                {
+                    var items = new List<Item>
+                    {
+                        new Item
+                        {
+                            ItemName = "Blue Denim Jeans",
+                            ItemPrice = 59.99M,
+                            ItemSize = "M",
+                            Description = "Classic blue denim jeans.",
+                            Category = jeansCategory, // Referencing existing category
+                            User = adminUser, // Referencing existing user
+                            ImageUrl = "https://example.com/blue-jeans.jpg"
+                        },
 
-            //        _context.Items.AddRange(items);
-            //        await _context.SaveChangesAsync();
-            //    }
-            //}
+                    };
+
+                    _context.Items.AddRange(items);
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
     }
 }
