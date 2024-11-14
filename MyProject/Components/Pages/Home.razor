@@ -10,19 +10,19 @@
 <div id="sidebar" class="sidebar">
     <ul class="nav flex-column p-3">
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-home">🏠</i> Home</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-home">🏠 </i> Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart">🛒</i> Shopping Cart </a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart">🛒 </i> Shopping Cart </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-info">ℹ️</i> About</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-info">ℹ️ </i> About</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-phone">📞</i> Contact</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-phone">📞 </i> Contact</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" @onclick="OnListItemClick"><i class="fas fa-plus">➕</i> List an Item </a>
+            <a class="nav-link sidebar-link" @onclick="OnListItemClick"><i class="fas fa-plus">➕ </i> List an Item </a>
         </li>
     </ul>
 </div>
@@ -81,7 +81,7 @@
 
     /* Sidebar Styling */
     .sidebar {
-        width: 200px;
+        width: 215px;
         height: 100vh;
         position: fixed;
         top: 56px; /* adjust to navbar height */
@@ -118,7 +118,7 @@
         top: 56px; /* starts below navbar */
         left: 0;
         width: 100%;
-        height: calc(100% - 56px); /* excludes navbar */
+        height: calc(100% - 56px); /* doesnt dim navbar */
         background: rgba(0, 0, 0, 0.5);
         z-index: 1049;
         opacity: 0;
