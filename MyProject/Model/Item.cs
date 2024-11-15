@@ -15,6 +15,7 @@ namespace MyProject.Model
 
         public Category? Category { get; set; }
         public User User { get; set; }
+        public string UserId { get; set; }
 
         public ICollection<OrderItem> OrderItems { get; set; }
     }

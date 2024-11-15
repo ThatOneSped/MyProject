@@ -54,16 +54,6 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label for="description">Description</label>
-                        <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" />
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="imageUrl">Image URL</label>
-                        <InputText id="imageUrl" class="form-control" @bind-Value="newItem.ImageUrl" />
-                    </div>
-
-                    <div class="form-group mb-3">
                         <label for="category">Category</label>
                         <InputSelect id="category" class="form-control" @bind-Value="newItem.Category.CategoryName">
                             @foreach (var category in categories)
@@ -73,6 +63,18 @@
                         </InputSelect>
                         <ValidationMessage For="@(() => newItem.Category.CategoryName)" />
                     </div>
+
+                    <div class="form-group mb-3">
+                        <label for="imageUrl">Image URL</label>
+                        <InputText id="imageUrl" class="form-control" @bind-Value="newItem.ImageUrl" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="description">Description</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" />
+                    </div>
+
+                   
 
                     <!-- warning message about incomplete form reducing sales volume -->
                     @if (formSubmitted && (string.IsNullOrWhiteSpace(newItem.Description) || string.IsNullOrWhiteSpace(newItem.ImageUrl) || newItem.Category == null || string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
@@ -121,8 +123,14 @@
         // checks if the user is logged in
         isLoggedIn = user.Identity.IsAuthenticated;
 
-        // grab the caterogries
+        // grab the categories
         categories = await ItemProvider.GetCategoriesAsync();
+
+        // Set the UserId of the new item if the user is logged in
+        if (isLoggedIn)
+        {
+            newItem.UserId = user.FindFirst(c => c.Type == "sub")?.Value;
+        }
     }
 
     private async Task HandleValidSubmit()
@@ -159,3 +167,4 @@
         confirmationGiven = true; // this means that the user has submitted the item without optional data
     }
 }
+
