@@ -77,7 +77,9 @@
                    
 
                     <!-- warning message about incomplete form reducing sales volume -->
-                    @if (formSubmitted && (string.IsNullOrWhiteSpace(newItem.Description) || string.IsNullOrWhiteSpace(newItem.ImageUrl) || newItem.Category == null || string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
+                    @if (formSubmitted &&
+                    (string.IsNullOrWhiteSpace(newItem.Description) || string.IsNullOrWhiteSpace(newItem.ImageUrl) || newItem.Category == null || string.IsNullOrWhiteSpace(newItem.Category.CategoryName)))
+                   
                     {
                         <div class="alert alert-warning mt-2">
                             Some fields are empty: Description, Image, or Category. Items with these details are more likely to sell.
@@ -126,7 +128,7 @@
         // grab the categories
         categories = await ItemProvider.GetCategoriesAsync();
 
-        // Set the UserId of the new item if the user is logged in
+        // sets the UserId of the new item if the user is logged in
         if (isLoggedIn)
         {
             newItem.UserId = user.FindFirst(c => c.Type == "sub")?.Value;

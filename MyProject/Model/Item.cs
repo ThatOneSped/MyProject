@@ -13,7 +13,7 @@ namespace MyProject.Model
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
 
-        public Category? Category { get; set; }
+        public Category Category { get; set; }
         public User User { get; set; }
         public string UserId { get; set; }
 
