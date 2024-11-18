@@ -5,9 +5,9 @@ namespace MyProject.Model
 {
     public class User : IdentityUser
     {
-        public string Name { get; set; }
-        public string Address { get; set; }
-        public List<Chat> SentChats { get; set; }
-        public List<Chat> ReceivedChats { get; set; }
+        public required string Name { get; set; }
+        public string? Address { get; set; }
+        public List<Chat>? SentChats { get; set; }
+        public List<Chat>? ReceivedChats { get; set; }
     }
 }

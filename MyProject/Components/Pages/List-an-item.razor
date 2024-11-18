@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using MyProject.Context
 @using MyProject.Model
+@using Microsoft.AspNetCore.Identity
 @inject NavigationManager NavigationManager
 @inject ItemProvider ItemProvider
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -131,12 +132,16 @@
         if (isLoggedIn)
         {
             newItem.UserId = user.FindFirst(c => c.Type == "sub")?.Value ?? user.FindFirst(c => c.Type == "nameidentifier")?.Value;
+            Console.WriteLine($"UserId initialized: {newItem.UserId}"); // Log UserId for debugging
         }
     }
 
     private async Task HandleValidSubmit()
     {
         formSubmitted = true; // tracks if the form was submitted
+
+        // Ensure that the UserId is assigned properly before submitting
+        Console.WriteLine($"Submitting item with UserId: {newItem.UserId}");
 
         if (!confirmationGiven &&
             (string.IsNullOrWhiteSpace(newItem.Description) ||
@@ -157,7 +162,7 @@
             }
             else
             {
-                throw new Exception("Category not found"); //this error shouldnt occur due to my usage of a selection list for categories
+                throw new Exception("Category not found"); //this error shouldn't occur due to my usage of a selection list for categories
             }
 
             await ItemProvider.AddItemAsync(newItem); // add item to db
