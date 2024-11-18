@@ -55,13 +55,13 @@
 
                     <div class="form-group mb-3">
                         <label for="category">Category</label>
-                        <InputSelect id="category" class="form-control" @bind-Value="newItem.Category.CategoryName">
+                        <InputSelect id="category" class="form-control" @bind-Value="selectedCategoryName">
                             @foreach (var category in categories)
                             {
                                 <option value="@category.CategoryName">@category.CategoryName</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => newItem.Category.CategoryName)" />
+                        <ValidationMessage For="@(() => selectedCategoryName)" />
                     </div>
 
                     <div class="form-group mb-3">
@@ -74,12 +74,12 @@
                         <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" />
                     </div>
 
-                   
-
                     <!-- warning message about incomplete form reducing sales volume -->
                     @if (formSubmitted &&
-                    (string.IsNullOrWhiteSpace(newItem.Description) || string.IsNullOrWhiteSpace(newItem.ImageUrl) || newItem.Category == null || string.IsNullOrWhiteSpace(newItem.Category.CategoryName)))
-                   
+                    (string.IsNullOrWhiteSpace(newItem.Description) ||
+                    string.IsNullOrWhiteSpace(newItem.ImageUrl) ||
+                    newItem.Category == null ||
+                    string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
                     {
                         <div class="alert alert-warning mt-2">
                             Some fields are empty: Description, Image, or Category. Items with these details are more likely to sell.
@@ -104,34 +104,33 @@
 </div>
 
 @code {
-    private Item newItem = new Item(); // clear room for new item
+    private Item newItem = new Item(); //clears form for new item
     private bool isSuccess = false; // see if item was successfully listed
     private bool isError = false; // see if there was an error when listing an item
     private bool confirmationGiven = false; // see if the user has submitted an item without optional fields
     private bool formSubmitted = false; // track if the user has attempted to submit the form
     private bool isLoggedIn = false; // track if the user is logged in
     private List<Category> categories = new(); // list of categories for dropdown
+    private string selectedCategoryName; // binds the category name
 
     protected override async Task OnInitializedAsync()
     {
         if (newItem.Category == null)
         {
-            newItem.Category = new Category();
+            newItem.Category = new Category(); // initialises the categories to prevent a null reference error (documented in implementation 2)
         }
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        // checks if the user is logged in
-        isLoggedIn = user.Identity.IsAuthenticated;
+        isLoggedIn = user.Identity.IsAuthenticated; // sees if the user is logged in
 
-        // grab the categories
-        categories = await ItemProvider.GetCategoriesAsync();
+        categories = await ItemProvider.GetCategoriesAsync(); // grabs the categories
 
         // sets the UserId of the new item if the user is logged in
         if (isLoggedIn)
         {
-            newItem.UserId = user.FindFirst(c => c.Type == "sub")?.Value;
+            newItem.UserId = user.FindFirst(c => c.Type == "sub")?.Value ?? user.FindFirst(c => c.Type == "nameidentifier")?.Value;
         }
     }
 
@@ -142,7 +141,7 @@
         if (!confirmationGiven &&
             (string.IsNullOrWhiteSpace(newItem.Description) ||
              string.IsNullOrWhiteSpace(newItem.ImageUrl) ||
-             string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
+             string.IsNullOrWhiteSpace(selectedCategoryName)))
         {
             // make user confirm before listing the item
             return;
@@ -150,6 +149,17 @@
 
         try
         {
+            // makes sure that the category is properly linked
+            var existingCategory = categories.FirstOrDefault(c => c.CategoryName == selectedCategoryName);
+            if (existingCategory != null)
+            {
+                newItem.Category = existingCategory; // links the item to the existing category
+            }
+            else
+            {
+                throw new Exception("Category not found"); //this error shouldnt occur due to my usage of a selection list for categories
+            }
+
             await ItemProvider.AddItemAsync(newItem); // add item to db
             isSuccess = true; // item successfully listed
             isError = false; // clear errors previously made
@@ -169,4 +179,5 @@
         confirmationGiven = true; // this means that the user has submitted the item without optional data
     }
 }
+
 
