@@ -153,11 +153,12 @@
 
     .scrollable-items-container {
         display: flex;
-        overflow: hidden; /* Hide the scrollbar */
+        overflow: hidden;
         gap: 15px;
         padding: 10px 0;
         justify-content: start;
         flex-wrap: nowrap;
+        scroll-behavior: smooth; /* Smooth scroll behavior */
     }
 
     .item-card {
@@ -185,13 +186,19 @@
         color: white;
         font-size: 24px;
         border: none;
-        padding: 10px;
+        padding: 10px 20px; 
         cursor: pointer;
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         z-index: 1;
-        border-radius: 50%;
+        border-radius: 8px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%; 
+        width: 40px; 
+        box-sizing: border-box; 
     }
 
         .scroll-button.left {
@@ -202,6 +209,9 @@
             right: 0;
         }
 
+        .scroll-button:hover {
+            background: rgba(0, 0, 0, 0.7); /* Darker on hover */
+        }
 
     /* styling for the item cards */
     .item-card {
@@ -289,12 +299,43 @@
 <script>
     function scrollLeft() {
         var container = document.querySelector('.scrollable-items-container');
-        container.scrollLeft -= 200; // Adjust the scroll distance
+        var scrollAmount = 200; // Distance to scroll
+        var currentScroll = container.scrollLeft;
+        var targetScroll = currentScroll - scrollAmount;
+
+        // Smooth scrolling via requestAnimationFrame
+        smoothScroll(container, currentScroll, targetScroll);
     }
 
     function scrollRight() {
         var container = document.querySelector('.scrollable-items-container');
-        container.scrollLeft += 200; // Adjust the scroll distance
+        var scrollAmount = 200;
+        var currentScroll = container.scrollLeft;
+        var targetScroll = currentScroll + scrollAmount;
+
+        // Smooth scrolling via requestAnimationFrame
+        smoothScroll(container, currentScroll, targetScroll);
+    }
+
+    // Smooth scroll function
+    function smoothScroll(container, start, end) {
+        var distance = end - start;
+        var startTime = null;
+
+        function animation(time) {
+            if (!startTime) startTime = time;
+            var progress = time - startTime;
+            var scrollPosition = start + distance * (progress / 400); // Adjust 400 for speed (ms)
+
+            if (progress < 400) { // Duration of the scroll (in ms)
+                container.scrollLeft = scrollPosition;
+                window.requestAnimationFrame(animation);
+            } else {
+                container.scrollLeft = end; // Ensure we hit the exact target scroll position
+            }
+        }
+
+        window.requestAnimationFrame(animation);
     }
 </script>
 
