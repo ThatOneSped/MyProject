@@ -40,6 +40,9 @@
                 <div class="item-card">
                     <img src="@item.ImageUrl" alt="@item.ItemName" />
                     <p>@item.ItemName</p>
+                    <p class="price">£@item.ItemPrice</p>
+                    <p class="size">Size: @item.ItemSize</p> <!-- Item Size displayed here -->
+                    <span class="heart-icon">&#9829;</span> <!-- heart icon for favouriting (will implement later)-->
                 </div>
             }
         </div>
@@ -198,6 +201,61 @@
         .scroll-button.right {
             right: 0;
         }
+
+
+    /* styling for the item cards */
+    .item-card {
+        width: 200px;
+        background: #fff;
+        border-radius: 12px; /* Rounded corners */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        text-align: center;
+        padding: 10px;
+        flex-shrink: 0;
+        position: relative; /* For positioning the heart icon */
+        overflow: hidden; /* To ensure the image doesn't spill out of the card */
+    }
+
+        .item-card img {
+            width: 100%;
+            height: 200px; /* Fixed height for uniformity */
+            object-fit: cover; /* Ensures the image covers the area without distorting */
+            border-radius: 8px; /* Slight rounding for the image */
+        }
+
+        .item-card p {
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .item-card .price {
+            margin-top: 5px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #dd5151; /* Highlighted price color */
+        }
+
+        .item-card .size {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #777; /* Lighter color for the size text */
+        }
+
+        .item-card .heart-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 18px;
+            color: #f00; /* Red heart for likes */
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+            .item-card .heart-icon:hover {
+                color: #dd5151; /* Changes heart color when hovered */
+            }
 
 </style>
 
