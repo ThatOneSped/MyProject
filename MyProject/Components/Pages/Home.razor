@@ -6,24 +6,19 @@
 @inject MyProject.Context.ItemProvider ItemProvider
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
     <ul class="nav flex-column p-3">
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-home">🏠 </i> Home</a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-home">🏠</i> Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart">🛒 </i> Shopping Cart </a>
+            <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart">🛒</i> Cart </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-info">ℹ️ </i> About</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link sidebar-link" href="#"><i class="fas fa-phone">📞 </i> Contact</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link sidebar-link" @onclick="OnListItemClick"><i class="fas fa-plus">➕ </i> List an Item </a>
+            <a class="nav-link sidebar-link" @onclick="OnListItemClick"><i class="fas fa-plus">➕</i> List an Item </a>
         </li>
     </ul>
 </div>
@@ -35,28 +30,21 @@
 <div id="main-content" class="main-content p-3">
     <h2>Featured Items</h2>
 
-    <!-- Scrolling Items -->
-    <div class="item-carousel">
-        <button class="scroll-button left" @onclick="ScrollLeft">&lt;</button>
-        <div class="item-row">
-            @if (featuredItems == null || !featuredItems.Any())
+    <!-- Scrollable Row of Items with Arrows -->
+    <div class="scrollable-items-container-wrapper">
+        <button class="scroll-button left" @onclick="ScrollLeft">&#8592;</button>
+
+        <div class="scrollable-items-container">
+            @foreach (var item in items)
             {
-                <p>Loading items...</p>
-            }
-            else
-            {
-                @foreach (var item in featuredItems)
-                {
-                    <div class="item-card">
-                        <img src="@item.ImageUrl" alt="@item.ItemName" class="item-image" />
-                        <h3>@item.ItemName</h3>
-                        <p>Price: £@item.ItemPrice</p>
-                        <p>Size: @item.ItemSize</p>
-                    </div>
-                }
+                <div class="item-card">
+                    <img src="@item.ImageUrl" alt="@item.ItemName" />
+                    <p>@item.ItemName</p>
+                </div>
             }
         </div>
-        <button class="scroll-button right" @onclick="ScrollRight">&gt;</button>
+
+        <button class="scroll-button right" @onclick="ScrollRight">&#8594;</button>
     </div>
 </div>
 
@@ -65,116 +53,229 @@
 
 <!-- CSS Styling -->
 <style>
-    /* Scrolling Items */
-    .item-carousel {
+    /* Color Theme */
+    :root {
+        --primary-color: #dd5151;
+        --text-light: #ffffff;
+    }
+
+    /* Toggle Button */
+    .toggle-sidebar-btn {
+        font-size: 24px;
+        position: fixed;
+        z-index: 1051;
+        background: var(--primary-color);
+        border: none;
+        cursor: pointer;
+        color: var(--text-light);
+        padding: 10px;
+        border-radius: 5px;
+        transition: left 0.3s ease, transform 0.3s ease;
+    }
+
+        .toggle-sidebar-btn.closed {
+            left: 20px; /* Position on left when sidebar is closed */
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%);
+        }
+
+        .toggle-sidebar-btn.open {
+            left: 180px; /* Offset button to the right of sidebar */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+    /* Sidebar Styling */
+    .sidebar {
+        width: 200px;
+        height: 100vh;
+        position: fixed;
+        top: 56px; /* adjust to navbar height */
+        left: -200px; /* starts off hidden  */
+        background-color: var(--primary-color);
+        border-right: 1px solid #e0e0e0;
+        transition: left 0.3s ease;
+        z-index: 1050;
+        color: var(--text-light);
+    }
+
+        .sidebar.active {
+            left: 0; /* Slide into view */
+        }
+
+    /* Sidebar Links */
+    .sidebar-link {
+        color: var(--text-light);
+        padding: 15px 20px;
+        font-size: 16px;
+        display: block;
+        text-decoration: none;
+    }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* hover effect */
+            color: var(--text-light);
+        }
+
+    /* Background Dimmer */
+    .background-dimmer {
+        display: none;
+        position: fixed;
+        top: 56px; /* starts below navbar */
+        left: 0;
+        width: 100%;
+        height: calc(100% - 56px); /* excludes navbar */
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1049;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+        .background-dimmer.active {
+            display: block;
+            opacity: 1;
+        }
+
+    /* Main Content */
+    .main-content.dimmed {
+        pointer-events: none; /* prevents interaction when dimmed */
+    }
+
+    /* Scrollable Row of Items with Arrow Navigation */
+    .scrollable-items-container-wrapper {
         display: flex;
         align-items: center;
-        overflow: hidden;
         position: relative;
     }
 
-    .item-row {
+    .scrollable-items-container {
         display: flex;
-        overflow-x: auto;
-        scroll-behavior: smooth;
+        overflow: hidden; /* Hide the scrollbar */
+        gap: 15px;
+        padding: 10px 0;
+        justify-content: start;
+        flex-wrap: nowrap;
     }
 
     .item-card {
-        min-width: 200px;
-        margin: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 10px;
+        width: 200px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         text-align: center;
-        background-color: #f9f9f9;
+        padding: 10px;
+        flex-shrink: 0;
     }
 
         .item-card img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .item-card p {
+            margin-top: 8px;
+            font-size: 16px;
         }
 
     .scroll-button {
-        background: var(--primary-color);
-        color: var(--text-light);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 24px;
         border: none;
-        border-radius: 50%;
         padding: 10px;
-        font-size: 20px;
         cursor: pointer;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+        border-radius: 50%;
     }
 
         .scroll-button.left {
-            position: absolute;
             left: 0;
         }
 
         .scroll-button.right {
-            position: absolute;
             right: 0;
         }
+
 </style>
 
-@code {
-    private List<Item> featuredItems = new(); // List to store featured items
-    private bool IsUserLoggedIn { get; set; } // Tracks if the user is logged in
+<!-- JavaScript for Sidebar Toggle -->
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const dimmer = document.getElementById('background-dimmer');
+        const mainContent = document.getElementById('main-content');
+        const toggleButton = document.getElementById('toggle-sidebar');
 
-    // Called when the component initializes
+        sidebar.classList.toggle('active');
+        dimmer.classList.toggle('active');
+        mainContent.classList.toggle('dimmed');
+
+        // Move the toggle button to the appropriate side
+        if (sidebar.classList.contains('active')) {
+            toggleButton.classList.remove('closed');
+            toggleButton.classList.add('open');
+        } else {
+            toggleButton.classList.remove('open');
+            toggleButton.classList.add('closed');
+        }
+    }
+
+    // Set initial position of toggle button
+    document.getElementById('toggle-sidebar').classList.add('closed');
+</script>
+
+<!-- JavaScript for scrolling stuff -->
+<script>
+    function scrollLeft() {
+        var container = document.querySelector('.scrollable-items-container');
+        container.scrollLeft -= 200; // Adjust the scroll distance
+    }
+
+    function scrollRight() {
+        var container = document.querySelector('.scrollable-items-container');
+        container.scrollLeft += 200; // Adjust the scroll distance
+    }
+</script>
+
+@code {
+    private bool IsUserLoggedIn { get; set; }
+    private List<Item> items { get; set; } = new List<Item>();
+
+    // checks if the user is logged in
     protected override async Task OnInitializedAsync()
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         IsUserLoggedIn = authenticationState.User.Identity.IsAuthenticated;
 
-        // Fetch items from the database
-        await LoadFeaturedItems();
+        // Load the items from the database
+        items = await ItemProvider.GetItemsAsync(); // Assuming GetItemsAsync returns a list of items
     }
 
-    // Load featured items from the database
-    private async Task LoadFeaturedItems()
-    {
-        try
-        {
-            featuredItems = await ItemProvider.GetItemsAsync(); // grabs items using ItemProvider
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching items: {ex.Message}");
-        }
-    }
-
-    // Scroll left
-    private void ScrollLeft()
-    {
-        var row = document.getElementById("item-row");
-        if (row != null)
-        {
-            row.scrollLeft -= 300; 
-        }
-    }
-
-    // Scroll right
-    private void ScrollRight()
-    {
-        var row = document.getElementById("item-row");
-        if (row != null)
-        {
-            row.scrollLeft += 300; // Adjust scrolling distance as needed
-        }
-    }
-
-    // This function is for when the user clicks the "List an Item" button
+    // handles click on "List an Item" button
     private void OnListItemClick()
     {
         if (IsUserLoggedIn)
         {
-            // redirect to the List an Item page if the user is logged in 
-            NavigationManager.NavigateTo("/list-an-item"); 
+            NavigationManager.NavigateTo("/list-an-item");
         }
         else
         {
-            // redirect to register page if the user isnt logged in
             NavigationManager.NavigateTo("/Account/Register");
         }
+    }
+
+    // Call JavaScript function to scroll left
+    private async Task ScrollLeft()
+    {
+        await JSRuntime.InvokeVoidAsync("scrollLeft");
+    }
+
+    // Call JavaScript function to scroll right
+    private async Task ScrollRight()
+    {
+        await JSRuntime.InvokeVoidAsync("scrollRight");
     }
 }
