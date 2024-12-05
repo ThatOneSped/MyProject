@@ -12,19 +12,19 @@
 <div id="sidebar" class="sidebar">
     <ul class="nav flex-column p-3">
         <li class="nav-item">
+            <!-- button that takes user to the main/home page-->
             <a class="nav-link sidebar-link" href="#"><i class="fas fa-home">🏠</i> Home</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item"> 
+            <!-- button that takes the user to their shopping cart -->
             <a class="nav-link sidebar-link" href="#"><i class="fas fa-shopping-cart">🛒</i> Cart </a>
         </li>
         <li class="nav-item">
+            <!-- button that takes user to the page where they can list their item -->
             <a class="nav-link sidebar-link" @onclick="OnListItemClick"><i class="fas fa-plus">➕</i> List an Item </a>
         </li>
     </ul>
 </div>
-
-<!-- Background Dimmer -->
-<div id="background-dimmer" class="background-dimmer" onclick="toggleSidebar()"></div>
 
 <!-- Main Content -->
 <div id="main-content" class="main-content p-3">
@@ -34,18 +34,18 @@
     <div class="scrollable-items-container-wrapper">
         <button class="scroll-button left" @onclick="ScrollLeft">&#8592;</button>
 
-        <div class="scrollable-items-container">
+         <div class="scrollable-items-container">
             @foreach (var item in items)
             {
-                <div class="item-card">
-                    <img src="@item.ImageUrl" alt="@item.ItemName" />
+                 <div class="item-card">
+                     <img src="@item.ImageUrl" alt="@item.ItemName" /> 
                     <p>@item.ItemName</p>
-                    <p class="price">£@item.ItemPrice</p>
-                    <p class="size">Size: @item.ItemSize</p> <!-- Item Size displayed here -->
-                    <span class="heart-icon">&#9829;</span> <!-- heart icon for favouriting (will implement later)-->
-                </div>
+                    <p class="price">£@item.ItemPrice</p> <!-- displays image, if no image avaialable, displays default image-->
+                    <p class="size">Size: @(string.IsNullOrEmpty(item.ItemSize) ? "Size not available" : item.ItemSize)</p> <!-- displays ItemSize, if null displays so -->
+                    <span class="heart-icon">&#9829;</span> <!-- heart icon for favouriting (will implement later) --> 
+                </div> 
             }
-        </div>
+        </div> 
 
         <button class="scroll-button right" @onclick="ScrollRight">&#8594;</button>
     </div>
@@ -54,16 +54,19 @@
 <!-- Toggle Button for Sidebar -->
 <button id="toggle-sidebar" onclick="toggleSidebar()" class="toggle-sidebar-btn">&#9776;</button>
 
-<!-- CSS Styling -->
+ <!-- CSS Styling -->
 <style>
     /* Color Theme */
-    :root {
+
+    :root 
+    {
         --primary-color: #dd5151;
         --text-light: #ffffff;
     }
 
     /* Toggle Button */
-    .toggle-sidebar-btn {
+    .toggle-sidebar-btn 
+    {
         font-size: 24px;
         position: fixed;
         z-index: 1051;
@@ -76,20 +79,23 @@
         transition: left 0.3s ease, transform 0.3s ease;
     }
 
-        .toggle-sidebar-btn.closed {
-            left: 20px; /* Position on left when sidebar is closed */
-            top: 50%; /* Center vertically */
+        .toggle-sidebar-btn.closed 
+        {
+            left: 20px; /* determines where button is on screen when sidebar is closed */
+            top: 50%;
             transform: translateY(-50%);
         }
 
-        .toggle-sidebar-btn.open {
-            left: 180px; /* Offset button to the right of sidebar */
+        .toggle-sidebar-btn.open 
+        {
+            left: 180px; /* offsets button to right of sidebar */
             top: 50%;
             transform: translateY(-50%);
         }
 
     /* Sidebar Styling */
-    .sidebar {
+    .sidebar 
+    {
         width: 200px;
         height: 100vh;
         position: fixed;
@@ -102,12 +108,14 @@
         color: var(--text-light);
     }
 
-        .sidebar.active {
+        .sidebar.active 
+        {
             left: 0; /* Slide into view */
         }
 
     /* Sidebar Links */
-    .sidebar-link {
+    .sidebar-link 
+    {
         color: var(--text-light);
         padding: 15px 20px;
         font-size: 16px;
@@ -115,13 +123,15 @@
         text-decoration: none;
     }
 
-        .sidebar-link:hover {
+        .sidebar-link:hover 
+        {
             background-color: rgba(255, 255, 255, 0.2); /* hover effect */
             color: var(--text-light);
         }
 
     /* Background Dimmer */
-    .background-dimmer {
+    .background-dimmer 
+    {
         display: none;
         position: fixed;
         top: 56px; /* starts below navbar */
@@ -134,34 +144,39 @@
         transition: opacity 0.3s ease;
     }
 
-        .background-dimmer.active {
+        .background-dimmer.active 
+        {
             display: block;
             opacity: 1;
         }
 
     /* Main Content */
-    .main-content.dimmed {
+    .main-content.dimmed 
+    {
         pointer-events: none; /* prevents interaction when dimmed */
     }
 
     /* Scrollable Row of Items with Arrow Navigation */
-    .scrollable-items-container-wrapper {
+    .scrollable-items-container-wrapper 
+    {
         display: flex;
         align-items: center;
         position: relative;
     }
 
-    .scrollable-items-container {
+    .scrollable-items-container 
+    {
         display: flex;
         overflow: hidden;
         gap: 15px;
         padding: 10px 0;
         justify-content: start;
         flex-wrap: nowrap;
-        scroll-behavior: smooth; /* Smooth scroll behavior */
+        scroll-behavior: smooth; /* Smooth scrolling */
     }
 
-    .item-card {
+    .item-card 
+    {
         width: 200px;
         background: #fff;
         border-radius: 8px;
@@ -171,50 +186,57 @@
         flex-shrink: 0;
     }
 
-        .item-card img {
+        .item-card img 
+        {
             width: 100%;
             border-radius: 8px;
         }
 
-        .item-card p {
+        .item-card p 
+        {
             margin-top: 8px;
             font-size: 16px;
         }
 
-    .scroll-button {
+    .scroll-button 
+    {
         background: rgba(0, 0, 0, 0.5);
         color: white;
         font-size: 24px;
         border: none;
-        padding: 10px 20px; 
+        padding: 10px 20px;
         cursor: pointer;
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         z-index: 1;
-        border-radius: 8px; 
+        border-radius: 8px;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100%; 
-        width: 40px; 
-        box-sizing: border-box; 
+        height: 100%;
+        width: 40px;
+        box-sizing: border-box;
     }
 
-        .scroll-button.left {
+        .scroll-button.left 
+        {
             left: 0;
         }
 
-        .scroll-button.right {
+        .scroll-button.right 
+        {
             right: 0;
         }
 
-        .scroll-button:hover {
+        .scroll-button:hover 
+        {
             background: rgba(0, 0, 0, 0.7); /* Darker on hover */
         }
 
     /* styling for the item cards */
-    .item-card {
+    .item-card 
+    {
         width: 200px;
         background: #fff;
         border-radius: 12px; /* Rounded corners */
@@ -226,34 +248,39 @@
         overflow: hidden; /* To ensure the image doesn't spill out of the card */
     }
 
-        .item-card img {
+        .item-card img 
+        {
             width: 100%;
             height: 200px; /* Fixed height for uniformity */
             object-fit: cover; /* Ensures the image covers the area without distorting */
             border-radius: 8px; /* Slight rounding for the image */
         }
 
-        .item-card p {
+        .item-card p 
+        {
             margin-top: 10px;
             font-size: 16px;
             font-weight: 500;
             color: #333;
         }
 
-        .item-card .price {
+        .item-card .price 
+        {
             margin-top: 5px;
             font-size: 18px;
             font-weight: 700;
             color: #dd5151; /* Highlighted price color */
         }
 
-        .item-card .size {
+        .item-card .size 
+        {
             margin-top: 5px;
             font-size: 14px;
             color: #777; /* Lighter color for the size text */
         }
 
-        .item-card .heart-icon {
+        .item-card .heart-icon 
+        {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -263,7 +290,8 @@
             transition: color 0.3s ease;
         }
 
-            .item-card .heart-icon:hover {
+            .item-card .heart-icon:hover 
+            {
                 color: #dd5151; /* Changes heart color when hovered */
             }
 
@@ -271,7 +299,8 @@
 
 <!-- JavaScript for Sidebar Toggle -->
 <script>
-    function toggleSidebar() {
+    function toggleSidebar()
+    {
         const sidebar = document.getElementById('sidebar');
         const dimmer = document.getElementById('background-dimmer');
         const mainContent = document.getElementById('main-content');
@@ -282,10 +311,13 @@
         mainContent.classList.toggle('dimmed');
 
         // Move the toggle button to the appropriate side
-        if (sidebar.classList.contains('active')) {
+        if (sidebar.classList.contains('active')) 
+        {
             toggleButton.classList.remove('closed');
             toggleButton.classList.add('open');
-        } else {
+        } 
+        else 
+        {
             toggleButton.classList.remove('open');
             toggleButton.classList.add('closed');
         }
@@ -325,13 +357,14 @@
         function animation(time) {
             if (!startTime) startTime = time;
             var progress = time - startTime;
-            var scrollPosition = start + distance * (progress / 400); // Adjust 400 for speed (ms)
+            var scrollPosition = start + distance * (progress / 400); // regulate speed
 
             if (progress < 400) { // Duration of the scroll (in ms)
                 container.scrollLeft = scrollPosition;
                 window.requestAnimationFrame(animation);
-            } else {
-                container.scrollLeft = end; // Ensure we hit the exact target scroll position
+            }
+            else {
+                container.scrollLeft = end;
             }
         }
 
