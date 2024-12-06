@@ -1,0 +1,98 @@
+﻿@page "/Item/{ID:int}"
+
+@using MyProject.Context
+@using MyProject.Model
+@inject MyProject.Context.ItemProvider ItemProvider
+
+
+<h1>@item?.ItemName</h1>
+
+@if (item == null)
+{
+    <p>Loading item details...</p>
+}
+else
+{
+    <div class="item-detail-container">
+        <img src="@item.ImageUrl" alt="@item.ItemName" />
+
+        <div class="item-details">
+            <h1>@item.ItemName</h1>
+            <p class="item-price">Price: £@item.ItemPrice</p>
+            <p class="item-size">Size: @(string.IsNullOrEmpty(item.ItemSize) ? "Not specified" : item.ItemSize)</p>
+            <p class="item-description">@item.Description</p>
+            <p class="item-category">Category: @item.Category?.CategoryName</p>
+            <p class="item-seller">Seller: @item.User?.Name</p>
+
+            <button class="add-to-cart-button">Add to Cart</button>
+        </div>
+    </div>
+}
+
+<style>
+    .item-detail-container {
+        display: flex;
+        align-items: start;
+        gap: 20px;
+        margin: 20px;
+    }
+
+    .item-image {
+        width: 300px;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .item-details {
+        max-width: 600px;
+    }
+
+        .item-details h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #333;
+        }
+
+    .item-price {
+        color: #dd5151;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .add-to-cart-button {
+        background-color: #dd5151;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+        .add-to-cart-button:hover {
+            background-color: #c74444;
+        }
+</style>
+
+@code {
+
+    [Parameter] 
+    public int ID { get; set; 
+    }
+    private Item? item;
+
+    protected override async Task OnInitializedAsync()
+    {
+        item = await ItemProvider.GetItemByIdAsync(ID); // Load item from database
+    }
+
+    public async Task<Item?> GetItemByIdAsync(int id)
+    {
+        return await _context.Items
+            .Include(i => i.Category)
+            .Include(i => i.User)
+            .FirstOrDefaultAsync(i => i.ID == id);
+    }
+}

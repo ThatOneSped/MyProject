@@ -37,7 +37,7 @@
          <div class="scrollable-items-container">
             @foreach (var item in items)
             {
-                 <div class="item-card">
+                 <div class="item-card" @onclick="() => NavigateToItemPage(item.ID)">
                      <img src="@item.ImageUrl" alt="@item.ItemName" /> 
                     <p>@item.ItemName</p>
                     <p class="price">£@item.ItemPrice</p> <!-- displays image, if no image avaialable, displays default image-->
@@ -399,15 +399,21 @@
         }
     }
 
-    // Call JavaScript function to scroll left
+    // calls JavaScript to scroll left
     private async Task ScrollLeft()
     {
         await JSRuntime.InvokeVoidAsync("scrollLeft");
     }
 
-    // Call JavaScript function to scroll right
+    // calls JavaScript to scroll right
     private async Task ScrollRight()
     {
         await JSRuntime.InvokeVoidAsync("scrollRight");
+    }
+
+    // takes user to item page 
+    private void NavigateToItemPage(int id)
+    {
+        NavigationManager.NavigateTo($"/item/{id}");
     }
 }
