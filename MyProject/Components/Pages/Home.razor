@@ -38,9 +38,9 @@
             @foreach (var item in items)
             {
                  <div class="item-card" @onclick="() => NavigateToItemPage(item.ID)">
-                     <img src="@item.ImageUrl" alt="@item.ItemName" /> 
+                    <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? item.ImageUrl : "images/noimage.png")" alt="@item.ItemName" /> <!-- displays image, if no image avaialable, displays default image-->
                     <p>@item.ItemName</p>
-                    <p class="price">£@item.ItemPrice</p> <!-- displays image, if no image avaialable, displays default image-->
+                    <p class="price">£@item.ItemPrice</p> 
                     <p class="size">Size: @(string.IsNullOrEmpty(item.ItemSize) ? "Size not available" : item.ItemSize)</p> <!-- displays ItemSize, if null displays so -->
                     <span class="heart-icon">&#9829;</span> <!-- heart icon for favouriting (will implement later) --> 
                 </div> 
@@ -54,19 +54,20 @@
 <!-- Toggle Button for Sidebar -->
 <button id="toggle-sidebar" onclick="toggleSidebar()" class="toggle-sidebar-btn">&#9776;</button>
 
- <!-- CSS Styling -->
+<!--background dimmer line-->
+<div class="background-dimmer" onclick="toggleSidebar()"></div>
+
+<!-- CSS Styling -->
 <style>
     /* Color Theme */
 
-    :root 
-    {
+    :root {
         --primary-color: #dd5151;
         --text-light: #ffffff;
     }
 
     /* Toggle Button */
-    .toggle-sidebar-btn 
-    {
+    .toggle-sidebar-btn {
         font-size: 24px;
         position: fixed;
         z-index: 1051;
@@ -79,28 +80,25 @@
         transition: left 0.3s ease, transform 0.3s ease;
     }
 
-        .toggle-sidebar-btn.closed 
-        {
+        .toggle-sidebar-btn.closed {
             left: 20px; /* determines where button is on screen when sidebar is closed */
             top: 50%;
             transform: translateY(-50%);
         }
 
-        .toggle-sidebar-btn.open 
-        {
-            left: 180px; /* offsets button to right of sidebar */
+        .toggle-sidebar-btn.open {
+            left: 220px; /* Position when sidebar is open */
             top: 50%;
             transform: translateY(-50%);
         }
 
     /* Sidebar Styling */
-    .sidebar 
-    {
+    .sidebar {
         width: 200px;
         height: 100vh;
         position: fixed;
-        top: 56px; /* adjust to navbar height */
-        left: -200px; /* starts off hidden  */
+        top: 56px; /* adjusts to navbar height */
+        left: -200px; /* starts off hidden */
         background-color: var(--primary-color);
         border-right: 1px solid #e0e0e0;
         transition: left 0.3s ease;
@@ -108,30 +106,27 @@
         color: var(--text-light);
     }
 
-        .sidebar.active 
-        {
-            left: 0; /* Slide into view */
+        .sidebar.active {
+            left: 0; /* slides into screen */
         }
 
     /* Sidebar Links */
-    .sidebar-link 
-    {
-        color: var(--text-light);
+    .sidebar-link {
+        color: var(--text-light); /* makes sure text is white */
         padding: 15px 20px;
         font-size: 16px;
         display: block;
-        text-decoration: none;
+        text-decoration: none; /* removes underlining a regular link has */
+        transition: background-color 0.3s ease, color 0.3s ease; /* smooths out transitions */
     }
 
-        .sidebar-link:hover 
-        {
-            background-color: rgba(255, 255, 255, 0.2); /* hover effect */
-            color: var(--text-light);
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* hover effect for buttons */
+            color: var(--text-light); /* Ensure the text remains white on hover */
         }
 
     /* Background Dimmer */
-    .background-dimmer 
-    {
+    .background-dimmer {
         display: none;
         position: fixed;
         top: 56px; /* starts below navbar */
@@ -144,28 +139,24 @@
         transition: opacity 0.3s ease;
     }
 
-        .background-dimmer.active 
-        {
+        .background-dimmer.active {
             display: block;
             opacity: 1;
         }
 
     /* Main Content */
-    .main-content.dimmed 
-    {
+    .main-content.dimmed {
         pointer-events: none; /* prevents interaction when dimmed */
     }
 
     /* Scrollable Row of Items with Arrow Navigation */
-    .scrollable-items-container-wrapper 
-    {
+    .scrollable-items-container-wrapper {
         display: flex;
         align-items: center;
         position: relative;
     }
 
-    .scrollable-items-container 
-    {
+    .scrollable-items-container {
         display: flex;
         overflow: hidden;
         gap: 15px;
@@ -175,8 +166,7 @@
         scroll-behavior: smooth; /* Smooth scrolling */
     }
 
-    .item-card 
-    {
+    .item-card {
         width: 200px;
         background: #fff;
         border-radius: 8px;
@@ -186,20 +176,17 @@
         flex-shrink: 0;
     }
 
-        .item-card img 
-        {
+        .item-card img {
             width: 100%;
             border-radius: 8px;
         }
 
-        .item-card p 
-        {
+        .item-card p {
             margin-top: 8px;
             font-size: 16px;
         }
 
-    .scroll-button 
-    {
+    .scroll-button {
         background: rgba(0, 0, 0, 0.5);
         color: white;
         font-size: 24px;
@@ -219,24 +206,20 @@
         box-sizing: border-box;
     }
 
-        .scroll-button.left 
-        {
+        .scroll-button.left {
             left: 0;
         }
 
-        .scroll-button.right 
-        {
+        .scroll-button.right {
             right: 0;
         }
 
-        .scroll-button:hover 
-        {
+        .scroll-button:hover {
             background: rgba(0, 0, 0, 0.7); /* Darker on hover */
         }
 
     /* styling for the item cards */
-    .item-card 
-    {
+    .item-card {
         width: 200px;
         background: #fff;
         border-radius: 12px; /* Rounded corners */
@@ -248,39 +231,34 @@
         overflow: hidden; /* To ensure the image doesn't spill out of the card */
     }
 
-        .item-card img 
-        {
+        .item-card img {
             width: 100%;
             height: 200px; /* Fixed height for uniformity */
             object-fit: cover; /* Ensures the image covers the area without distorting */
             border-radius: 8px; /* Slight rounding for the image */
         }
 
-        .item-card p 
-        {
+        .item-card p {
             margin-top: 10px;
             font-size: 16px;
             font-weight: 500;
             color: #333;
         }
 
-        .item-card .price 
-        {
+        .item-card .price {
             margin-top: 5px;
             font-size: 18px;
             font-weight: 700;
             color: #dd5151; /* Highlighted price color */
         }
 
-        .item-card .size 
-        {
+        .item-card .size {
             margin-top: 5px;
             font-size: 14px;
             color: #777; /* Lighter color for the size text */
         }
 
-        .item-card .heart-icon 
-        {
+        .item-card .heart-icon {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -290,8 +268,7 @@
             transition: color 0.3s ease;
         }
 
-            .item-card .heart-icon:hover 
-            {
+            .item-card .heart-icon:hover {
                 color: #dd5151; /* Changes heart color when hovered */
             }
 
@@ -299,27 +276,25 @@
 
 <!-- JavaScript for Sidebar Toggle -->
 <script>
-    function toggleSidebar()
-    {
+    function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
-        const dimmer = document.getElementById('background-dimmer');
-        const mainContent = document.getElementById('main-content');
         const toggleButton = document.getElementById('toggle-sidebar');
+        const dimmer = document.querySelector('.background-dimmer');
+        const mainContent = document.getElementById('main-content');
 
-        sidebar.classList.toggle('active');
-        dimmer.classList.toggle('active');
-        mainContent.classList.toggle('dimmed');
-
-        // Move the toggle button to the appropriate side
-        if (sidebar.classList.contains('active')) 
-        {
-            toggleButton.classList.remove('closed');
-            toggleButton.classList.add('open');
-        } 
-        else 
-        {
+        // Toggle the sidebar and button classes
+        if (sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
             toggleButton.classList.remove('open');
             toggleButton.classList.add('closed');
+            dimmer.classList.remove('active');
+            mainContent.classList.remove('dimmed');
+        } else {
+            sidebar.classList.add('active');
+            toggleButton.classList.remove('closed');
+            toggleButton.classList.add('open');
+            dimmer.classList.add('active');
+            mainContent.classList.add('dimmed');
         }
     }
 
@@ -341,7 +316,7 @@
 
     function scrollRight() {
         var container = document.querySelector('.scrollable-items-container');
-        var scrollAmount = 200;
+        var scrollAmount = 800;
         var currentScroll = container.scrollLeft;
         var targetScroll = currentScroll + scrollAmount;
 

@@ -22,7 +22,7 @@ else
             <p class="item-size">Size: @(string.IsNullOrEmpty(item.ItemSize) ? "Not specified" : item.ItemSize)</p>
             <p class="item-description">@item.Description</p>
             <p class="item-category">Category: @item.Category?.CategoryName</p>
-            <p class="item-seller">Seller: @item.User?.Name</p>
+            <p class="item-seller">Seller: @item.User.Name</p>
 
             <button class="add-to-cart-button">Add to Cart</button>
         </div>
@@ -91,8 +91,8 @@ else
     public async Task<Item?> GetItemByIdAsync(int id)
     {
         return await _context.Items
-            .Include(i => i.Category)
-            .Include(i => i.User)
-            .FirstOrDefaultAsync(i => i.ID == id);
+           .Include(i => i.Category)
+           .Include(i => i.User)
+           .FirstOrDefaultAsync(i => i.ID == id);
     }
 }
