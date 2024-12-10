@@ -116,10 +116,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (newItem.Category == null)
-        {
-            newItem.Category = new Category(); // initialises the categories to prevent a null reference error (documented in implementation)
-        }
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
