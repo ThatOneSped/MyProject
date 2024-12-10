@@ -32,7 +32,7 @@
 
     <!-- Scrollable Row of Items with Arrows -->
     <div class="scrollable-items-container-wrapper">
-        <button class="scroll-button left" @onclick="ScrollLeft">&#8592;</button>
+        <button class="scroll-button left" @onclick="ScrollLeft">&#8592;</button> <!--calls scrolling left javascript-->
 
          <div class="scrollable-items-container">
             @foreach (var item in items)
@@ -47,7 +47,7 @@
             }
         </div> 
 
-        <button class="scroll-button right" @onclick="ScrollRight">&#8594;</button>
+        <button class="scroll-button right" @onclick="ScrollRight">&#8594;</button> <!--calls scrolling right javascript-->
     </div>
 </div>
 
@@ -87,7 +87,7 @@
         }
 
         .toggle-sidebar-btn.open {
-            left: 220px; /* Position when sidebar is open */
+            left: 220px; /* position when sidebar is open */
             top: 50%;
             transform: translateY(-50%);
         }
@@ -306,7 +306,7 @@
 <script>
     function scrollLeft() {
         var container = document.querySelector('.scrollable-items-container');
-        var scrollAmount = 200; // Distance to scroll
+        var scrollAmount = 800; // Distance to scroll
         var currentScroll = container.scrollLeft;
         var targetScroll = currentScroll - scrollAmount;
 

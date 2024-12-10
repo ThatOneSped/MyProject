@@ -38,28 +38,28 @@
 
                     <div class="form-group mb-3">
                         <label for="itemName">Item Name</label>
-                        <InputText id="itemName" class="form-control" @bind-Value="newItem.ItemName" required />
-                        <ValidationMessage For="@(() => newItem.ItemName)" />
+                        <InputText id="itemName" class="form-control" @bind-Value="newItem.ItemName" required /> <!-- input for name -->
+                        <ValidationMessage For="@(() => newItem.ItemName)" /> 
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="itemPrice">Item Price</label>
-                        <InputNumber id="itemPrice" class="form-control" @bind-Value="newItem.ItemPrice" required />
-                        <ValidationMessage For="@(() => newItem.ItemPrice)" />
+                        <InputNumber id="itemPrice" class="form-control" @bind-Value="newItem.ItemPrice" required /> <!-- input for price -->
+                        <ValidationMessage For="@(() => newItem.ItemPrice)" /> 
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="itemSize">Item Size</label>
-                        <InputText id="itemSize" class="form-control" @bind-Value="newItem.ItemSize" required />
-                        <ValidationMessage For="@(() => newItem.ItemSize)" />
+                        <InputText id="itemSize" class="form-control" @bind-Value="newItem.ItemSize" required /> <!-- input for size -->
+                        <ValidationMessage For="@(() => newItem.ItemSize)" /> 
                     </div>
 
                     <div class="form-group mb-3">
-                        <label for="category">Category</label>
+                        <label for="category">Category</label>  
                         <InputSelect id="category" class="form-control" @bind-Value="selectedCategoryName">
                             @foreach (var category in categories)
                             {
-                                <option value="@category.CategoryName">@category.CategoryName</option>
+                                <option value="@category.CategoryName">@category.CategoryName</option> <!-- dropdown list for category -->
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => selectedCategoryName)" />
@@ -67,12 +67,12 @@
 
                     <div class="form-group mb-3">
                         <label for="imageUrl">Image URL</label>
-                        <InputText id="imageUrl" class="form-control" @bind-Value="newItem.ImageUrl" />
+                        <InputText id="imageUrl" class="form-control" @bind-Value="newItem.ImageUrl" /> <!-- input for image -->
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="description">Description</label>
-                        <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" />
+                        <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" /> <!-- input for description -->
                     </div>
 
                     <!-- warning message about incomplete form reducing sales volume -->
@@ -80,7 +80,7 @@
                     (string.IsNullOrWhiteSpace(newItem.Description) ||
                     string.IsNullOrWhiteSpace(newItem.ImageUrl) ||
                     newItem.Category == null ||
-                    string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
+                    string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))  //split it up onto multiple lines instead of 1 long one
                     {
                         <div class="alert alert-warning mt-2">
                             Some fields are empty: Description, Image, or Category. Items with these details are more likely to sell.
@@ -118,7 +118,7 @@
     {
         if (newItem.Category == null)
         {
-            newItem.Category = new Category(); // initialises the categories to prevent a null reference error (documented in implementation 2)
+            newItem.Category = new Category(); // initialises the categories to prevent a null reference error (documented in implementation)
         }
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
