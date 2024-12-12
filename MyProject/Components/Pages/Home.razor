@@ -37,7 +37,7 @@
          <div class="scrollable-items-container">
             @foreach (var item in items)
             {
-                 <div class="item-card" @onclick="() => NavigateToItemPage(item.ID)">
+                 <div class="item-card" @onclick="() => NavigateToItemPage(item.ID)"> <!-- takes user to item upon click -->
                     <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? item.ImageUrl : "images/noimage.png")" alt="@item.ItemName" /> <!-- displays image, if no image avaialable, displays default image-->
                     <p>@item.ItemName</p>
                     <p class="price">£@item.ItemPrice</p> 

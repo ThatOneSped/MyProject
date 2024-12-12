@@ -3,4 +3,53 @@
 @using MyProject.Context
 @using MyProject.Model
 @inject MyProject.Context.ItemProvider ItemProvider
+@inject NavigationManager NavigationManager
 
+
+<div class="container mt-4">
+    @if (Item == null)
+    {
+        <div class="text-center">
+            <p>Loading item details...</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Item Image -->
+            <div class="col-md-6">
+                <img src="@Item.ImageUrl" alt="@Item.ItemName" class="img-fluid rounded shadow-sm" style="width: 100%;" />
+            </div>
+
+            <!-- Item Details -->
+            <div class="col-md-6">
+                <h2 class="mb-3">@Item.ItemName</h2>
+                <p class="text-muted">@Item.Description</p>
+                <h4 class="mt-4" style="color: #c64a4a;">£@Item.ItemPrice</h4>
+                <p class="text-muted small">Category: @Item.Category</p>
+
+                <!-- Buy Button -->
+                <div class="mt-4">
+                    <button class="btn btn-primary btn-lg w-100" @onclick="PurchaseItem">Buy Now</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int ID { get; set; }
+
+    private Item? Item { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Item = await ItemProvider.GetItemByIdAsync(ID);
+        if (Item == null)
+        {
+            // Redirect to a 404 page or handle error
+            NavigationManager.NavigateTo("/NotFound");
+        }
+    }
+}
