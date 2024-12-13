@@ -5,7 +5,6 @@
 @inject MyProject.Context.ItemProvider ItemProvider
 @inject NavigationManager NavigationManager
 
-
 <div class="container mt-4">
     @if (Item == null)
     {
@@ -18,20 +17,24 @@
         <div class="row">
             <!-- Item Image -->
             <div class="col-md-6">
-                <img src="@Item.ImageUrl" alt="@Item.ItemName" class="img-fluid rounded shadow-sm" style="width: 100%;" />
+                <img src="@(!string.IsNullOrEmpty(Item.ImageUrl) ? Item.ImageUrl : "images/noimage.png")"
+                     alt="@Item.ItemName" class="img-fluid rounded shadow-sm" style="width: 100%;" />
             </div>
 
             <!-- Item Details -->
             <div class="col-md-6">
                 <h2 class="mb-3">@Item.ItemName</h2>
-                <p class="text-muted">@Item.Description</p>
+                <p class="text-muted small">Category: @(Item.Category?.CategoryName ?? "No category available")</p>
                 <h4 class="mt-4" style="color: #c64a4a;">£@Item.ItemPrice</h4>
-                <p class="text-muted small">Category: @Item.Category</p>
 
-                <!-- Buy Button -->
+                <!-- Add to Cart and Buy Buttons -->
                 <div class="mt-4">
+                    <button class="btn btn-secondary btn-lg w-100 mb-2" @onclick="AddToCart">Add to Cart</button>
                     <button class="btn btn-primary btn-lg w-100" @onclick="PurchaseItem">Buy Now</button>
                 </div>
+
+                <!-- Item Description-->
+                <p class="text-muted">@Item.Description</p>
             </div>
         </div>
     }
@@ -51,5 +54,15 @@
             // Redirect to a 404 page or handle error
             NavigationManager.NavigateTo("/NotFound");
         }
+    }
+
+    private void AddToCart()
+    {
+        //setup for AddToCart function
+    }
+
+    private void PurchaseItem()
+    {
+        //setup for AddToCart function
     }
 }

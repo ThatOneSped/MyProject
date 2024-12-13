@@ -1,0 +1,14 @@
+﻿@page "/NotFound"
+@inject NavigationManager NavigationManager
+
+<div class="container d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
+    <h1 class="text-center text-danger mb-4">Item does not exist :(</h1>  <!-- tells the user item doesnt exist -->
+    <button class="btn btn-primary btn-lg" @onclick="NavigateHome">Back to Home</button> <!-- button to take user back -->
+</div>
+
+@code {
+    private void NavigateHome()  //function to take user back to homepage
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
