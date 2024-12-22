@@ -1,5 +1,4 @@
 ﻿@page "/list-an-item"
-@using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using MyProject.Context
 @using MyProject.Model
@@ -125,18 +124,20 @@
 
         categories = await ItemProvider.GetCategoriesAsync(); // grabs the categories
 
+        // sets the UserId of the new item if the user is logged in
         if (isLoggedIn)
         {
-            // check common claim types used for user ID
-            newItem.UserId = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
-                             ?? user.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
-                             ?? user.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            newItem.UserId = user.FindFirst(c => c.Type == "sub")?.Value ?? user.FindFirst(c => c.Type == "nameidentifier")?.Value;
+            Console.WriteLine($"UserId initialized: {newItem.UserId}"); // Log UserId for debugging
         }
     }
 
     private async Task HandleValidSubmit()
     {
         formSubmitted = true; // tracks if the form was submitted
+
+        // Ensure that the UserId is assigned properly before submitting
+        Console.WriteLine($"Submitting item with UserId: {newItem.UserId}");
 
         if (!confirmationGiven &&
             (string.IsNullOrWhiteSpace(newItem.Description) ||
