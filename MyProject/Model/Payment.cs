@@ -9,6 +9,15 @@ namespace MyProject.Model
 
         public string PaymentType { get; set; }
 
+        public int LongNumber { get; set; }
+
+        public DateOnly ExpiryDate { get; set; }
+
+        public string SortCode { get; set; }
+
+        public int CVV { get; set; }
+
         public required User User { get; set; }
+
     }
 }

@@ -8,7 +8,7 @@ namespace MyProject.Model
         public int ID { get; set; }  // Primary Key
 
         public string ItemName { get; set; }
-        public decimal ItemPrice { get; set; }
+        public decimal? ItemPrice { get; set; }
         public string? ItemSize { get; set; }
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }

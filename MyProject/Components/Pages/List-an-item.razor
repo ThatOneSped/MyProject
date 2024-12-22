@@ -38,49 +38,58 @@
 
                     <div class="form-group mb-3">
                         <label for="itemName">Item Name</label>
-                        <InputText id="itemName" class="form-control" @bind-Value="newItem.ItemName" required /> <!-- input for name -->
-                        <ValidationMessage For="@(() => newItem.ItemName)" /> 
+                        <InputText id="itemName" class="form-control" @bind-Value="newItem.ItemName" required />
+                        <ValidationMessage For="@(() => newItem.ItemName)" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="itemPrice">Item Price</label>
-                        <InputNumber id="itemPrice" class="form-control" @bind-Value="newItem.ItemPrice" required /> <!-- input for price -->
-                        <ValidationMessage For="@(() => newItem.ItemPrice)" /> 
+                        <InputNumber id="itemPrice" class="form-control" @bind-Value="newItem.ItemPrice" required />
+                        <ValidationMessage For="@(() => newItem.ItemPrice)" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="itemSize">Item Size</label>
-                        <InputText id="itemSize" class="form-control" @bind-Value="newItem.ItemSize" required /> <!-- input for size -->
-                        <ValidationMessage For="@(() => newItem.ItemSize)" /> 
+                        <InputText id="itemSize" class="form-control" @bind-Value="newItem.ItemSize" required />
+                        <ValidationMessage For="@(() => newItem.ItemSize)" />
                     </div>
 
                     <div class="form-group mb-3">
-                        <label for="category">Category</label>  
+                        <label for="category">Category</label>
                         <InputSelect id="category" class="form-control" @bind-Value="selectedCategoryName">
                             @foreach (var category in categories)
                             {
-                                <option value="@category.CategoryName">@category.CategoryName</option> <!-- dropdown list for category -->
+                                <option value="@category.CategoryName">@category.CategoryName</option>
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => selectedCategoryName)" />
                     </div>
 
                     <div class="form-group mb-3">
-                        <label for="imageUrl">Image URL</label>
-                        <InputText id="imageUrl" class="form-control" @bind-Value="newItem.ImageUrl" /> <!-- input for image -->
+                        <label for="imageUpload">Image Upload</label>
+                        <div class="d-flex align-items-center">
+                            <InputFile id="imageUpload" class="form-control-file" OnChange="HandleImageSelected" />
+                            <button type="button" class="btn btn-outline-secondary ms-2" @onclick="() => OpenFileSelector()">Upload Image</button>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(newItem.ImageUrl))
+                        {
+                            <div class="mt-2">
+                                <img src="@newItem.ImageUrl" alt="Selected Image" class="img-thumbnail" style="max-width: 200px;" />
+                            </div>
+                        }
+                        <ValidationMessage For="@(() => newItem.ImageUrl)" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="description">Description</label>
-                        <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" /> <!-- input for description -->
+                        <InputTextArea id="description" class="form-control" @bind-Value="newItem.Description" />
                     </div>
 
-                    <!-- warning message about incomplete form reducing sales volume -->
                     @if (formSubmitted &&
                     (string.IsNullOrWhiteSpace(newItem.Description) ||
                     string.IsNullOrWhiteSpace(newItem.ImageUrl) ||
                     newItem.Category == null ||
-                    string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))  //split it up onto multiple lines instead of 1 long one
+                    string.IsNullOrWhiteSpace(newItem.Category?.CategoryName)))
                     {
                         <div class="alert alert-warning mt-2">
                             Some fields are empty: Description, Image, or Category. Items with these details are more likely to sell.
@@ -116,7 +125,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -124,7 +132,6 @@
 
         categories = await ItemProvider.GetCategoriesAsync(); // grabs the categories
 
-        // sets the UserId of the new item if the user is logged in
         if (isLoggedIn)
         {
             newItem.UserId = user.FindFirst(c => c.Type == "sub")?.Value ?? user.FindFirst(c => c.Type == "nameidentifier")?.Value;
@@ -136,7 +143,6 @@
     {
         formSubmitted = true; // tracks if the form was submitted
 
-        // Ensure that the UserId is assigned properly before submitting
         Console.WriteLine($"Submitting item with UserId: {newItem.UserId}");
 
         if (!confirmationGiven &&
@@ -144,41 +150,62 @@
              string.IsNullOrWhiteSpace(newItem.ImageUrl) ||
              string.IsNullOrWhiteSpace(selectedCategoryName)))
         {
-            // make user confirm before listing the item
             return;
         }
 
         try
         {
-            // makes sure that the category is properly linked
             var existingCategory = categories.FirstOrDefault(c => c.CategoryName == selectedCategoryName);
             if (existingCategory != null)
             {
-                newItem.Category = existingCategory; // links the item to the existing category
+                newItem.Category = existingCategory;
             }
             else
             {
-                throw new Exception("Category not found"); //this error shouldn't occur due to my usage of a selection list for categories
+                throw new Exception("Category not found");
             }
 
-            await ItemProvider.AddItemAsync(newItem); // add item to db
-            isSuccess = true; // item successfully listed
-            isError = false; // clear errors previously made
-            newItem = new Item(); // clear form for new item
-            confirmationGiven = false; // resets confirmation ready for the next item
-            formSubmitted = false; // reset the form submission tracker
+            await ItemProvider.AddItemAsync(newItem);
+            isSuccess = true;
+            isError = false;
+            newItem = new Item();
+            confirmationGiven = false;
+            formSubmitted = false;
         }
         catch (Exception)
         {
-            isSuccess = false; // displays error
+            isSuccess = false;
             isError = true;
+        }
+    }
+
+    private async Task HandleImageSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            if (file != null)
+            {
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream(maxAllowedSize: 1048576).ReadAsync(buffer);
+
+                newItem.ImageUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error uploading file: {ex.Message}");
         }
     }
 
     private void ConfirmContinue()
     {
-        confirmationGiven = true; // this means that the user has submitted the item without optional data
+        confirmationGiven = true;
+    }
+
+    private void OpenFileSelector()
+    {
+        // InputFile component opens the dialog automatically, no further action needed
     }
 }
-
 
