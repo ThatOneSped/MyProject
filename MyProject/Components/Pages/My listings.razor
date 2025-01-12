@@ -1,0 +1,125 @@
+﻿@page "/my-listings"
+@using Microsoft.AspNetCore.Components.Authorization
+@using MyProject.Context
+@using MyProject.Model
+@inject ItemProvider ItemProvider
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="container mt-4">
+    <h2>My Listings</h2>
+
+    @if (isLoading)
+    {
+        <p>Loading your listings...</p>
+    }
+    else if (userListings.Count == 0)
+    {
+        <p>You have no active listings.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in userListings)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="@item.ImageUrl" class="card-img-top" alt="Item Image" />
+                        <div class="card-body">
+                            <h5 class="card-title">@item.ItemName</h5>
+                            <p class="card-text">Price: £@item.ItemPrice</p>
+                            <p class="card-text">@item.Description</p>
+
+                            <button class="btn btn-primary btn-sm" @onclick="() => EditListing(item.ID)">Edit Listing</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => ConfirmDelete(item.ID)">Delete Listing</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Delete Confirmation Modal -->
+    @if (showDeleteModal)
+    {
+        <div class="modal-backdrop show"></div>
+        <div class="modal show d-block" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" @onclick="CloseDeleteModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this listing?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseDeleteModal">No</button>
+                        <button type="button" class="btn btn-danger" @onclick="DeleteListing">Yes, Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Item> userListings = new(); // list of user's listings
+    private bool isLoading = true; // track if data is loading
+    private bool showDeleteModal = false; // controls visibility of delete confirmation modal
+    private int? listingToDeleteId = null; // The ID of the listing to be deleted
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(c => c.Type == "sub")?.Value ?? user.FindFirst(c => c.Type == "nameidentifier")?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                userListings = await ItemProvider.GetItemsByUserIdAsync(userId); // Fetch user's listings
+            }
+        }
+
+        isLoading = false; // Set loading to false once data is loaded
+    }
+
+    private void EditListing(int itemId)
+    {
+        NavigationManager.NavigateTo($"/edit-your-listing/{itemId}"); // Redirect to edit listing page
+    }
+
+    private void ConfirmDelete(int itemId)
+    {
+        listingToDeleteId = itemId; // Set the item ID to be deleted
+        showDeleteModal = true; // Show the delete confirmation modal
+    }
+
+    private void CloseDeleteModal()
+    {
+        listingToDeleteId = null; // Clear the item ID
+        showDeleteModal = false; // Hide the delete confirmation modal
+    }
+
+    private async Task DeleteListing()
+    {
+        if (listingToDeleteId.HasValue)
+        {
+            try
+            {
+                await ItemProvider.DeleteItemAsync(listingToDeleteId.Value); // Delete the item from database
+                userListings = userListings.Where(item => item.ID != listingToDeleteId.Value).ToList(); // Remove from the local list
+            }
+
+            finally
+            {
+                CloseDeleteModal(); // Close the modal
+            }
+        }
+    }
+}

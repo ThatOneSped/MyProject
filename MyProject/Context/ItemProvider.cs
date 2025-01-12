@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,14 @@ namespace MyProject.Context
         public async Task<List<Category>> GetCategoriesAsync() // method to grab categories
         {
             return await _context.Categories.ToListAsync();
+        }
+
+        public async Task<List<Item>> GetItemsByUserIdAsync(string userId) // method to get items by UserId
+        {
+            return await _context.Items
+                .Where(i => i.UserId == userId) // grab items where the UserId matches
+                .Include(i => i.Category)      // iIncludes categoru for each item
+                .ToListAsync();
         }
     }
 }
